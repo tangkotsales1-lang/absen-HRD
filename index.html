@@ -1,0 +1,1817 @@
+<title>Absensi Klandestine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6fa;
+    --surface:#ffffff;
+    --surface-2:#eef1f7;
+    --ink:#151a26;
+    --ink-soft:#636d80;
+    --border:#dfe3ec;
+    --accent:#2557d6;
+    --accent-ink:#eef3ff;
+    --success:#15803d; --success-bg:#e4f5ea;
+    --warning:#b26a05; --warning-bg:#fdf1dc;
+    --danger:#c22f3f;  --danger-bg:#fbe8ea;
+    --shadow: 0 1px 2px rgba(21,26,38,.04), 0 4px 14px -8px rgba(21,26,38,.10);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1218; --surface:#161a23; --surface-2:#1e2330;
+      --ink:#eef0f5; --ink-soft:#9aa2b5; --border:#2a2f3d;
+      --accent:#5b8cf0; --accent-ink:#0b1526;
+      --success:#3fbd77; --success-bg:#0f2c1c;
+      --warning:#e3a63f; --warning-bg:#362908;
+      --danger:#ef6470; --danger-bg:#3a151a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px -8px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1218; --surface:#161a23; --surface-2:#1e2330;
+    --ink:#eef0f5; --ink-soft:#9aa2b5; --border:#2a2f3d;
+    --accent:#5b8cf0; --accent-ink:#0b1526;
+    --success:#3fbd77; --success-bg:#0f2c1c;
+    --warning:#e3a63f; --warning-bg:#362908;
+    --danger:#ef6470; --danger-bg:#3a151a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px -8px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;
+    padding-inline:16px; padding-block:0;
+    line-height:1.45;
+  }
+  h1,h2,h3,.display{font-family:'Plus Jakarta Sans',ui-sans-serif,sans-serif; font-weight:700; letter-spacing:-.01em; text-wrap:balance;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  .wrap{max-width:1120px; margin-inline:auto; padding-block:20px 56px;}
+
+  /* ---- Header ---- */
+  header.top{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+    background:var(--bg); border-bottom:1px solid var(--border);
+    margin-inline:-16px; padding-inline:16px;
+  }
+  .top-inner{max-width:1120px; margin-inline:auto; display:flex; align-items:center; justify-content:space-between; gap:12px; padding-block:12px; flex-wrap:wrap;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .mark{width:32px; height:32px; flex:none;}
+  .brand-text .name{font-family:'Plus Jakarta Sans',ui-sans-serif,sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:0; line-height:1;}
+  .brand-text .sub{font-size:.72rem; color:var(--ink-soft); letter-spacing:.01em;}
+
+  .header-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .badge{
+    font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    background:var(--warning-bg); color:var(--warning); border:1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+    padding:4px 9px; border-radius:999px; white-space:nowrap;
+  }
+
+  .icon-btn-row{display:flex; align-items:center; gap:4px;}
+  .icon-btn{
+    display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px;
+    border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); border-radius:8px; cursor:pointer;
+  }
+  .icon-btn svg{width:16px; height:16px;}
+  .icon-btn:hover{background:var(--surface-2); color:var(--ink);}
+
+  .segmented{display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:3px; gap:2px;}
+  .segmented button{
+    border:none; background:transparent; color:var(--ink-soft); font-size:.82rem; font-weight:600;
+    padding:7px 14px; border-radius:8px; cursor:pointer; transition:.15s;
+  }
+  .segmented button.active{background:var(--accent); color:var(--accent-ink);}
+
+  /* ---- Notice banner ---- */
+  .notice{
+    display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:10px; padding:12px 14px; margin-block:16px;
+    font-size:.85rem; color:var(--ink-soft);
+  }
+  .notice b{color:var(--ink);}
+  .notice button{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:1rem; line-height:1; padding:2px; margin-left:auto;}
+
+  /* ---- Admin shell: sidebar + main ---- */
+  .admin-shell{display:flex; align-items:flex-start; gap:26px;}
+  .admin-sidebar{
+    width:208px; flex:none; display:flex; flex-direction:column; gap:2px;
+    padding-block:14px; position:sticky; top:calc(env(safe-area-inset-top,0px) + 68px);
+  }
+  .admin-sidebar button{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    border:none; background:none; color:var(--ink-soft); font-size:.85rem; font-weight:600;
+    padding:9px 11px; border-radius:8px; cursor:pointer; white-space:nowrap;
+  }
+  .admin-sidebar button svg{width:17px; height:17px; flex:none; opacity:.7;}
+  .admin-sidebar button:hover{background:var(--surface-2);}
+  .admin-sidebar button.active{background:var(--accent); color:var(--accent-ink);}
+  .admin-sidebar button.active svg{opacity:1;}
+  .admin-main{flex:1; min-width:0; padding-block:14px 0;}
+  @media (max-width:860px){
+    .admin-shell{flex-direction:column; gap:0;}
+    .admin-sidebar{
+      position:static; width:100%; flex-direction:row; overflow-x:auto;
+      padding-block:10px; margin-block-end:6px; border-bottom:1px solid var(--border); gap:4px;
+    }
+    .admin-sidebar button span{white-space:nowrap;}
+    .admin-main{padding-block:16px 0;}
+  }
+
+  /* ---- Cards / grid ---- */
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow);}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-block-end:20px;}
+  .stat{padding:16px 18px;}
+  .stat .label{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:600;}
+  .stat .value{font-family:'Plus Jakarta Sans',ui-sans-serif,sans-serif; font-weight:800; font-size:1.9rem; line-height:1.1; margin-top:4px;}
+  .stat .value small{font-size:1rem; color:var(--ink-soft); font-weight:600; font-family:'Plus Jakarta Sans';}
+
+  .section-title{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-block-end:12px; flex-wrap:wrap;}
+  .section-title h2{font-size:1.35rem; margin:0;}
+
+  /* ---- Dashboard: hero + widgets + two-column ---- */
+  .hero{display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px 26px; margin-block-end:16px; overflow:hidden;}
+  .hero-text h2{margin:0 0 3px; font-size:1.4rem;}
+  .hero-text .date{font-size:.8rem; color:var(--ink-soft); margin:0 0 14px;}
+  .shortcut-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .shortcut-row .btn{border-radius:999px;}
+  .hero-deco{width:104px; height:104px; flex:none; color:var(--accent); opacity:.9;}
+  @media (max-width:640px){ .hero{flex-direction:column; align-items:flex-start;} .hero-deco{display:none;} }
+
+  .widget-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(216px,1fr)); gap:14px; margin-block-end:16px;}
+  .widget{padding:16px 18px;}
+  .widget .label{font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:600; display:block; margin-bottom:14px;}
+
+  .bar-track{display:flex; height:8px; border-radius:999px; overflow:hidden; background:var(--surface-2); margin-bottom:12px;}
+  .bar-seg{height:100%;}
+  .bar-legend{display:flex; flex-direction:column; gap:6px; font-size:.78rem; color:var(--ink-soft);}
+  .bar-legend .dot-row{display:flex; align-items:center; gap:6px;}
+  .bar-legend i{width:7px; height:7px; border-radius:50%; flex:none; display:inline-block;}
+  .bar-legend b{color:var(--ink); margin-left:auto; font-family:'IBM Plex Mono';}
+
+  .trend-bars{display:flex; align-items:flex-end; gap:6px; height:62px;}
+  .trend-bars .tcol{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:4px;}
+  .trend-bars .tbar{width:100%; background:var(--accent); border-radius:3px 3px 0 0; min-height:3px;}
+  .trend-bars .tlabel{font-size:.62rem; color:var(--ink-soft);}
+
+  .donut-wrap{display:flex; align-items:center; gap:16px;}
+  .donut{width:72px; height:72px; border-radius:50%; flex:none;}
+  .donut-legend{display:flex; flex-direction:column; gap:6px; font-size:.76rem; color:var(--ink-soft); min-width:0; flex:1;}
+  .donut-legend span{display:flex; align-items:center; gap:6px; min-width:0;}
+  .donut-legend i{width:7px; height:7px; border-radius:50%; flex:none; display:inline-block;}
+  .donut-legend .dn-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1;}
+  .donut-legend b{flex:none; color:var(--ink); font-weight:600;}
+
+  .dash-columns{display:grid; grid-template-columns:2fr 1fr; gap:16px; align-items:start;}
+  @media (max-width:800px){ .dash-columns{grid-template-columns:1fr;} }
+  .mini-tabs{display:flex; gap:18px; border-bottom:1px solid var(--border); margin-bottom:12px;}
+  .mini-tabs button{background:none; border:none; color:var(--ink-soft); font-size:.82rem; font-weight:600; padding:8px 1px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;}
+  .mini-tabs button.active{color:var(--ink); border-bottom-color:var(--accent);}
+  .side-card{padding:16px 18px; margin-block-end:14px;}
+  .side-card h3{margin:0 0 10px; font-size:.92rem;}
+  .quick-link-btn{display:flex; align-items:center; gap:9px; width:100%; text-align:left; border:none; background:none; padding:8px 6px; font-size:.82rem; font-weight:600; color:var(--ink); cursor:pointer; border-radius:7px;}
+  .quick-link-btn:hover{background:var(--surface-2);}
+  .quick-link-btn svg{width:16px; height:16px; color:var(--accent); flex:none;}
+
+  table{width:100%; border-collapse:collapse; font-size:.85rem;}
+  th{text-align:left; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:600; padding:9px 12px; border-bottom:1px solid var(--border);}
+  td{padding:10px 12px; border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+  td.num, th.num{text-align:right; font-family:'IBM Plex Mono'; font-variant-numeric:tabular-nums;}
+  .row-actions{display:flex; align-items:center; gap:6px; flex-wrap:nowrap; white-space:nowrap;}
+  .row-actions .btn{flex:none; white-space:nowrap;}
+  .row-actions .btn-toggle{width:96px; text-align:center;}
+  .row-actions select{flex:none; width:128px; min-width:128px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  .pill{display:inline-flex; align-items:center; gap:5px; font-size:.7rem; font-weight:600; padding:3px 9px; border-radius:999px;}
+  .pill.ok{background:var(--success-bg); color:var(--success);}
+  .pill.warn{background:var(--warning-bg); color:var(--warning);}
+  .pill.bad{background:var(--danger-bg); color:var(--danger);}
+  .pill.muted{background:var(--surface-2); color:var(--ink-soft);}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border-radius:9px; border:1px solid transparent; padding:9px 15px; font-size:.85rem; font-weight:600;
+    cursor:pointer; transition:filter .15s;
+  }
+  .btn:hover{filter:brightness(.95);}
+  .btn-primary{background:var(--accent); color:var(--accent-ink);}
+  .btn-ghost{background:var(--surface-2); color:var(--ink); border-color:var(--border);}
+  .btn-outline{background:transparent; color:var(--ink); border-color:var(--border);}
+  .btn-sm{padding:6px 11px; font-size:.76rem; border-radius:7px;}
+  .btn-danger{background:var(--danger-bg); color:var(--danger);}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  label{font-size:.75rem; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:5px;}
+  input[type=text], input[type=email], input[type=number], input[type=date], input[type=time], select, textarea{
+    width:100%; background:var(--bg); border:1px solid var(--border); color:var(--ink);
+    border-radius:8px; padding:8px 10px; font-size:.85rem; font-family:inherit;
+  }
+  .field{margin-bottom:12px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:640px){ .grid-2,.grid-3{grid-template-columns:1fr;} }
+
+  .empty{color:var(--ink-soft); font-size:.85rem; padding:22px 12px; text-align:center;}
+
+  /* ---- Employee auth (login / register) ---- */
+  .auth-wrap{display:flex; justify-content:center; padding-block:24px 30px;}
+  .auth-card{width:100%; max-width:380px; padding:26px 24px; text-align:left;}
+  .auth-card h2{font-size:1.25rem; margin:0 0 4px;}
+  .auth-sub{font-size:.8rem; color:var(--ink-soft); margin:0 0 18px;}
+  .auth-hint{font-size:.74rem; color:var(--ink-soft); background:var(--surface-2); border-radius:8px; padding:9px 11px; margin:12px 0 0; line-height:1.5;}
+  .auth-switch{font-size:.82rem; color:var(--ink-soft); text-align:center; margin:16px 0 0;}
+  .auth-switch a{color:var(--accent); font-weight:600; text-decoration:none;}
+  .auth-switch a:hover{text-decoration:underline;}
+  .auth-error{font-size:.78rem; color:var(--danger); background:var(--danger-bg); border-radius:8px; padding:8px 10px; margin:0 0 12px;}
+
+  /* ---- Employee phone frame ---- */
+  .phone-stage{display:flex; justify-content:center; padding-block:10px 30px;}
+  .phone{
+    width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border);
+    border-radius:18px; box-shadow:var(--shadow); overflow:hidden;
+  }
+  .phone-head{padding:16px 18px 10px; border-bottom:1px solid var(--border);}
+  .phone-body{padding:16px 16px 8px; min-height:360px;}
+  .phone-nav{display:flex; border-top:1px solid var(--border);}
+  .phone-nav button{
+    flex:1; background:none; border:none; padding:13px 4px 14px; font-size:.92rem; font-weight:800;
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .phone-nav button.active{color:var(--accent);}
+
+  .greet{font-size:.8rem; color:var(--ink-soft);}
+  .who{font-family:'Plus Jakarta Sans',ui-sans-serif,sans-serif; font-weight:800; font-size:1.3rem;}
+  .clock-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-block:12px;}
+  .clock-tile{background:var(--surface-2); border-radius:12px; padding:12px; text-align:center;}
+  .clock-tile .t-label{font-size:.68rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;}
+  .clock-tile .t-value{font-family:'IBM Plex Mono'; font-weight:600; font-size:1.3rem; margin-top:2px;}
+  .big-btn{width:100%; padding:13px; border-radius:11px; font-size:.9rem; margin-bottom:8px;}
+  .hist-row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:.82rem;}
+  .hist-row:last-child{border-bottom:none;}
+
+  .toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px;
+    font-size:.82rem; font-weight:600; box-shadow:var(--shadow); z-index:50;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+
+  .disclaimer{
+    font-size:.78rem; background:var(--warning-bg); color:var(--warning); border-radius:9px; padding:10px 12px; margin-block:14px;
+  }
+
+  .selector-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-block-end:14px;}
+  .selector-row select{width:auto; min-width:180px;}
+
+  /* ---- Selfie attendance capture ---- */
+  .selfie-overlay{
+    position:fixed; inset:0; background:rgba(15,17,23,.6); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; padding:18px; z-index:80;
+  }
+  .selfie-card{
+    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; box-shadow:var(--shadow); padding:20px; max-height:92vh; overflow-y:auto;
+  }
+  .selfie-frame{
+    width:100%; aspect-ratio:1/1; background:var(--surface-2); border-radius:14px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; margin-bottom:10px; position:relative;
+  }
+  .selfie-frame video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+  .selfie-frame img{width:100%; height:100%; object-fit:cover;}
+  .selfie-status{font-size:.78rem; color:var(--ink-soft); text-align:center; margin:0 0 10px; line-height:1.5;}
+  .selfie-actions{display:flex; gap:8px;}
+  .selfie-actions .btn{flex:1;}
+  .selfie-upload-alt{
+    display:block; text-align:center; font-size:.76rem; color:var(--ink-soft); margin-top:12px; cursor:pointer;
+  }
+  .selfie-upload-alt span{color:var(--accent); font-weight:600; text-decoration:underline;}
+
+  .selfie-thumb{
+    width:30px; height:30px; border-radius:8px; object-fit:cover; cursor:pointer;
+    border:1px solid var(--border); flex:none;
+  }
+  .photo-viewer-overlay{
+    position:fixed; inset:0; background:rgba(10,11,15,.82); z-index:90;
+    display:flex; align-items:center; justify-content:center; padding:24px; cursor:zoom-out;
+  }
+  .photo-viewer-overlay img{max-width:min(90vw,460px); max-height:85vh; border-radius:12px; box-shadow:var(--shadow);}
+
+  [hidden]{display:none !important;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" role="img" aria-label="Klandestine">
+        <rect x="1" y="1" width="38" height="38" rx="9" fill="var(--accent)"/>
+        <text x="20" y="27" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="19" fill="var(--accent-ink)">K</text>
+      </svg>
+      <div class="brand-text">
+        <div class="name">Klandestine</div>
+        <div class="sub">Absensi &amp; Payroll</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="badge">Mode Pratinjau</span>
+      <div class="icon-btn-row">
+        <button class="icon-btn" aria-label="Cari" onclick="toast('Pencarian belum aktif di mode pratinjau.')">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="6.2"/><path d="M17.5 17.5L13.8 13.8"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifikasi" onclick="toast('Belum ada notifikasi baru.')">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5 1.5 5h-13S5 12 5 8Z"/><path d="M8.2 16a1.9 1.9 0 0 0 3.6 0"/></svg>
+        </button>
+      </div>
+      <div class="segmented" role="tablist" aria-label="Lihat sebagai">
+        <button id="roleAdminBtn" class="active" onclick="setRole('admin')">Tampilan Admin</button>
+        <button id="roleEmpBtn" onclick="setRole('employee')">Tampilan Karyawan</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="noticeBanner" class="notice">
+    <span>💡</span>
+    <span><b>Ini pratinjau interaktif</b> — semua data di bawah contoh, dan berubah hanya untuk sesi ini (hilang saat halaman di-refresh). Logika perhitungan gajinya sama persis dengan file aplikasi lengkap yang sudah dikirim ke chat.</span>
+    <button onclick="document.getElementById('noticeBanner').remove()" aria-label="Tutup">✕</button>
+  </div>
+
+  <!-- ===================== ADMIN VIEW ===================== -->
+  <div id="adminView">
+    <div class="admin-shell">
+      <nav class="admin-sidebar" id="adminSidebar" aria-label="Navigasi admin"></nav>
+      <div class="admin-main"><div id="adminContent"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== EMPLOYEE VIEW ===================== -->
+  <div id="employeeView" hidden>
+    <div id="employeeArea"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="selfieModal" class="selfie-overlay" hidden>
+  <div class="selfie-card">
+    <h3 id="selfieModalTitle" style="margin:0 0 4px;font-size:1rem;">Selfie untuk Absen Masuk</h3>
+    <p style="font-size:.78rem;color:var(--ink-soft);margin:0 0 14px;">Foto ini dipakai untuk memverifikasi kamu yang absen langsung (anti titip absen).</p>
+    <div class="selfie-frame">
+      <video id="selfieVideo" autoplay playsinline muted></video>
+      <img id="selfiePreview" alt="Preview selfie" hidden>
+    </div>
+    <canvas id="selfieCanvas" hidden></canvas>
+    <p id="selfieStatus" class="selfie-status" hidden></p>
+    <div class="selfie-actions">
+      <button class="btn btn-primary" id="selfieCaptureBtn" onclick="captureSelfie()">Ambil Foto</button>
+      <button class="btn btn-ghost" id="selfieRetakeBtn" onclick="retakeSelfie()" hidden>Ambil Ulang</button>
+      <button class="btn btn-primary" id="selfieConfirmBtn" onclick="confirmSelfieAndProceed()" hidden>Gunakan Foto &amp; Absen</button>
+    </div>
+    <label class="selfie-upload-alt">
+      Tidak bisa akses kamera? <span>Upload foto dari galeri/kamera</span>
+      <input type="file" accept="image/*" capture="user" id="selfieFileInput" onchange="handleSelfieFileUpload(this)" hidden>
+    </label>
+    <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;" onclick="closeSelfieModal()">Batal</button>
+  </div>
+</div>
+
+<div id="photoViewer" class="photo-viewer-overlay" hidden onclick="closePhotoViewer()">
+  <img id="photoViewerImg" src="" alt="Foto selfie absensi">
+</div>
+
+<script>
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+const $ = (sel, el=document) => el.querySelector(sel);
+const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function rupiah(n){ return 'Rp ' + Math.round(n||0).toLocaleString('id-ID'); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function isoDate(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
+function todayParts(){ const d=new Date(); return {y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate()}; }
+function todayISO(){ const t=todayParts(); return isoDate(t.y,t.m,t.d); }
+function daysInMonth(m,y){ return new Date(y,m,0).getDate(); }
+function dayOfWeek(y,m,d){ return new Date(y,m-1,d).getDay(); } // 0 sun .. 6 sat
+function countWeekdaysUpTo(m,y,uptoDay){
+  let c=0;
+  for(let d=1; d<=uptoDay; d++){ const w=dayOfWeek(y,m,d); if(w!==0 && w!==6) c++; }
+  return c;
+}
+function overlapDays(aStart,aEnd,bStart,bEnd){
+  const s = new Date(Math.max(new Date(aStart), new Date(bStart)));
+  const e = new Date(Math.min(new Date(aEnd), new Date(bEnd)));
+  if (s>e) return 0;
+  return Math.round((e-s)/86400000)+1;
+}
+function addMinutes(hhmm, minsToAdd){
+  const [h,m] = hhmm.split(':').map(Number);
+  let total = h*60+m+Math.round(minsToAdd);
+  total = ((total % 1440)+1440)%1440;
+  return pad2(Math.floor(total/60))+':'+pad2(total%60);
+}
+function minutesOf(hhmm){ const [h,m]=hhmm.split(':').map(Number); return h*60+m; }
+function fmtMonthYear(m,y){
+  const names=['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${names[m]} ${y}`;
+}
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._h); toast._h = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function distanceMeters(lat1,lng1,lat2,lng2){
+  if ([lat1,lng1,lat2,lng2].some(v => v==null || Number.isNaN(v))) return null;
+  const R = 6371000, toRad = d => d*Math.PI/180;
+  const dLat = toRad(lat2-lat1), dLng = toRad(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* =========================================================
+   STATE + SEED DATA
+   ========================================================= */
+const state = {
+  role: 'admin',
+  adminTab: 'dashboard',
+  currentEmployeeId: 1,
+  loggedInEmployeeId: null,
+  authView: 'login',
+  employeeTab: 'home',
+  nextIds: { user: 4, att: 1, leave: 1, run: 1, loc: 4, partner: 3 },
+  settings: {
+    companyName: 'Klandestine Merch',
+    adminName: 'Riyadi',
+    workStart: '09:00', workEnd: '17:00', lateTolerance: 15,
+    enforceGeofence: false,
+    requireSelfie: true,
+    bpjsKesehatan: 1, bpjsJht: 2, bpjsJp: 1, taxPercent: 5,
+    overtimeMultiplier: 1.5, workingDaysPerMonth: 22
+  },
+  locations: [
+    { id:1, name:'Kantor Pusat — Jakarta', address:'Jl. Sudirman, Jakarta Selatan', lat:-6.2000, lng:106.8167, radiusM:150, status:'active' },
+    { id:2, name:'Toko Bandung', address:'Jl. Braga, Bandung', lat:-6.9175, lng:107.6191, radiusM:100, status:'active' },
+    { id:3, name:'Toko Surabaya', address:'Jl. Tunjungan, Surabaya', lat:-7.2575, lng:112.7521, radiusM:250, status:'active' },
+  ],
+  employees: [
+    { id:1, name:'Budi Santoso', email:'budi@klandestine.local', password:'karyawan123', position:'Staff Produksi', baseSalary:4500000, allowance:300000, locationId:1, status:'active' },
+    { id:2, name:'Siti Aminah', email:'siti@klandestine.local', password:'karyawan123', position:'Staff Gudang', baseSalary:4200000, allowance:250000, locationId:2, status:'active' },
+    { id:3, name:'Rina Wulandari', email:'rina@klandestine.local', password:'karyawan123', position:'Admin Toko', baseSalary:4800000, allowance:350000, locationId:3, status:'active' },
+  ],
+  partners: [
+    { id:1, name:'CV Rekan Sablon Jaya', email:'kontak@rekansablon.co.id', position:'Mitra Produksi Sablon', commissionPercent:30, allowance:0, locationId:1, status:'active' },
+    { id:2, name:'Dewi Anggraini', email:'dewi.reseller@klandestine.local', position:'Mitra Reseller', commissionPercent:20, allowance:0, locationId:2, status:'active' },
+  ],
+  attendance: [], // {id,userId,date,clockIn,clockOut,status,overtimeHours,hasLoc}
+  leaves: [],     // {id,userId,type,start,end,reason,status}
+  payrollRuns: [],    // {id,month,year,generatedAt}
+  payrollItems: [],   // {runId,userId,base,allowance,overtime,lateDed,absenceDed,bpjs,pph21,net,present,late,absent,leave}
+};
+
+function seed(){
+  const t = todayParts();
+  let prevM = t.m-1, prevY = t.y;
+  if (prevM===0){ prevM=12; prevY--; }
+  const prevDays = daysInMonth(prevM, prevY);
+
+  function pattern(day, empIdx){
+    const k = (day + empIdx*2) % 9;
+    if (k===0) return 'absent';
+    if (k===1 || k===2) return 'late';
+    return 'present';
+  }
+
+  // full previous month attendance (weekdays only)
+  state.employees.forEach((emp, idx) => {
+    for (let d=1; d<=prevDays; d++){
+      const w = dayOfWeek(prevY, prevM, d);
+      if (w===0 || w===6) continue;
+      const st = pattern(d, idx);
+      if (st==='absent') continue;
+      const ot = ((d+idx) % 6 === 0) ? 1.5 : 0;
+      const clockIn = st==='late' ? addMinutes(state.settings.workStart, state.settings.lateTolerance + 15 + (idx*5)%20) : addMinutes(state.settings.workStart, -5);
+      const clockOut = ot>0 ? addMinutes(state.settings.workEnd, ot*60) : state.settings.workEnd;
+      state.attendance.push({ id: state.nextIds.att++, userId: emp.id, date: isoDate(prevY,prevM,d), clockIn, clockOut, status: st, overtimeHours: ot, hasLoc:true });
+    }
+  });
+
+  // current month attendance up to (but excluding) today
+  state.employees.forEach((emp, idx) => {
+    for (let d=1; d<t.d; d++){
+      const w = dayOfWeek(t.y, t.m, d);
+      if (w===0 || w===6) continue;
+      const st = pattern(d, idx);
+      if (st==='absent') continue;
+      const ot = ((d+idx) % 6 === 0) ? 1.5 : 0;
+      const clockIn = st==='late' ? addMinutes(state.settings.workStart, state.settings.lateTolerance + 15 + (idx*5)%20) : addMinutes(state.settings.workStart, -5);
+      const clockOut = ot>0 ? addMinutes(state.settings.workEnd, ot*60) : state.settings.workEnd;
+      state.attendance.push({ id: state.nextIds.att++, userId: emp.id, date: isoDate(t.y,t.m,d), clockIn, clockOut, status: st, overtimeHours: ot, hasLoc:true });
+    }
+  });
+
+  // leave requests
+  state.leaves.push({ id: state.nextIds.leave++, userId:2, type:'izin', start: todayISO(), end: todayISO(), reason:'Antar anak ke dokter', status:'pending' });
+  state.leaves.push({ id: state.nextIds.leave++, userId:3, type:'cuti', start: isoDate(prevY,prevM,10), end: isoDate(prevY,prevM,11), reason:'Cuti tahunan', status:'approved' });
+
+  // seeded payroll run for previous month
+  const run = { id: state.nextIds.run++, month: prevM, year: prevY, generatedAt: isoDate(prevY,prevM,prevDays)+' 18:05' };
+  state.payrollRuns.push(run);
+  state.employees.forEach(emp => state.payrollItems.push(calcPayroll(emp, prevM, prevY, run.id)));
+}
+
+/* =========================================================
+   PAYROLL CALCULATION (mirrors the full backend app)
+   ========================================================= */
+function calcPayroll(emp, month, year, runId){
+  const s = state.settings;
+  const t = todayParts();
+  const isCurrent = (month===t.m && year===t.y);
+  const lastDay = daysInMonth(month, year);
+  const uptoDay = isCurrent ? t.d : lastDay;
+  const workingDays = countWeekdaysUpTo(month, year, uptoDay);
+  const denom = s.workingDaysPerMonth || workingDays || 1;
+
+  const periodAtt = state.attendance.filter(a => a.userId===emp.id && a.date.startsWith(`${year}-${pad2(month)}`));
+  const present = periodAtt.filter(a=>a.status==='present').length;
+  const late = periodAtt.filter(a=>a.status==='late').length;
+  const overtimeHours = periodAtt.reduce((sum,a)=>sum+(a.overtimeHours||0),0);
+
+  const periodStart = isoDate(year,month,1), periodEnd = isoDate(year,month,uptoDay);
+  const approved = state.leaves.filter(l => l.userId===emp.id && l.status==='approved' && l.start<=periodEnd && l.end>=periodStart);
+  let leaveDays = 0;
+  approved.forEach(l => leaveDays += overlapDays(l.start,l.end,periodStart,periodEnd));
+
+  const hadir = present+late;
+  const absent = Math.max(0, workingDays - hadir - leaveDays);
+
+  const dailyRate = emp.baseSalary/denom;
+  const hourly = dailyRate/8;
+  const lateDed = late * dailyRate * 0.05;
+  const absenceDed = absent * dailyRate;
+  const overtimePay = overtimeHours * hourly * s.overtimeMultiplier;
+  const gross = emp.baseSalary + emp.allowance + overtimePay - lateDed - absenceDed;
+
+  const bpjsKes = emp.baseSalary * s.bpjsKesehatan/100;
+  const bpjsJht = emp.baseSalary * s.bpjsJht/100;
+  const bpjsJp  = emp.baseSalary * s.bpjsJp/100;
+  const taxable = Math.max(0, gross - bpjsKes - bpjsJht);
+  const pph21 = taxable * s.taxPercent/100;
+  const net = gross - bpjsKes - bpjsJht - bpjsJp - pph21;
+
+  return { runId, userId: emp.id, base: emp.baseSalary, allowance: emp.allowance, overtime: overtimePay,
+    lateDed, absenceDed, bpjsKes, bpjsJht, bpjsJp, pph21, net,
+    present, late, absent, leaveDays };
+}
+
+/* =========================================================
+   RENDER: SHELL / ROLE SWITCH
+   ========================================================= */
+function setRole(role){
+  state.role = role;
+  $('#roleAdminBtn').classList.toggle('active', role==='admin');
+  $('#roleEmpBtn').classList.toggle('active', role==='employee');
+  $('#adminView').hidden = role!=='admin';
+  $('#employeeView').hidden = role!=='employee';
+  render();
+}
+
+function render(){
+  if (state.role==='admin') renderAdmin(); else renderEmployee();
+}
+
+/* =========================================================
+   ADMIN VIEW
+   ========================================================= */
+/* Simple generic line-icon set (original paths, 22x22, stroke-based) for sidebar nav */
+const ICONS = {
+  grid: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="12" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="12" width="7" height="7" rx="1.5"/><rect x="12" y="12" width="7" height="7" rx="1.5"/></svg>`,
+  users: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="3.2"/><path d="M2.8 18c.6-3 2.7-4.6 5.2-4.6s4.6 1.6 5.2 4.6"/><circle cx="16" cy="7.5" r="2.6"/><path d="M14.5 13.6c2.2.1 3.9 1.7 4.5 4.4"/></svg>`,
+  pin: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20s6.5-6.1 6.5-11.2A6.5 6.5 0 1 0 4.5 8.8C4.5 13.9 11 20 11 20z"/><circle cx="11" cy="8.6" r="2.3"/></svg>`,
+  check: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="15" height="15" rx="3"/><path d="M7.5 11.2l2.4 2.4 4.6-5"/></svg>`,
+  calendar: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.3" width="16" height="14" rx="2.5"/><path d="M3 8.6h16M7 2.5v3.2M15 2.5v3.2"/><path d="M7.5 13l2 2 4-4.2"/></svg>`,
+  wallet: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.8" y="5.5" width="16.4" height="12" rx="2.5"/><path d="M2.8 9h16.4"/><circle cx="15.2" cy="13.6" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  gear: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="3.1"/><path d="M11 2.8v2.3M11 15.9v2.3M18.2 11h-2.3M6.1 11H3.8M16 6l-1.6 1.6M7.6 14.4L6 16M16 16l-1.6-1.6M7.6 7.6L6 6"/></svg>`,
+  briefcase: `<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.3" width="16" height="11.2" rx="2.2"/><path d="M8 7.3V5.6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.7"/><path d="M3 12.3h16"/><path d="M9.7 12.3v1.6h2.6v-1.6"/></svg>`,
+};
+
+const ADMIN_TABS = [
+  ['dashboard','Dashboard',ICONS.grid], ['employees','Karyawan',ICONS.users], ['partners','Mitra',ICONS.briefcase], ['locations','Lokasi & Cabang',ICONS.pin],
+  ['attendance','Absensi',ICONS.check], ['leave','Cuti & Izin',ICONS.calendar], ['payroll','Payroll',ICONS.wallet],
+  ['settings','Pengaturan',ICONS.gear]
+];
+
+function renderAdmin(){
+  $('#adminSidebar').innerHTML = ADMIN_TABS.map(([key,label,icon]) =>
+    `<button class="${state.adminTab===key?'active':''}" onclick="setAdminTab('${key}')">${icon}<span>${label}</span></button>`
+  ).join('');
+  const c = $('#adminContent');
+  if (state.adminTab==='dashboard') c.innerHTML = adminDashboardHtml();
+  else if (state.adminTab==='employees') c.innerHTML = adminEmployeesHtml();
+  else if (state.adminTab==='partners') c.innerHTML = adminPartnersHtml();
+  else if (state.adminTab==='locations') c.innerHTML = adminLocationsHtml();
+  else if (state.adminTab==='attendance') c.innerHTML = adminAttendanceHtml();
+  else if (state.adminTab==='leave') c.innerHTML = adminLeaveHtml();
+  else if (state.adminTab==='payroll') c.innerHTML = adminPayrollHtml();
+  else if (state.adminTab==='settings') c.innerHTML = adminSettingsHtml();
+  wireAdminEvents();
+}
+function setAdminTab(key){ state.adminTab = key; if(key!=='payroll') state.viewingRunId=null; renderAdmin(); }
+
+const IDN_DAYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const IDN_MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+function greetingWord(){
+  const h = new Date().getHours();
+  if (h < 11) return 'Selamat pagi';
+  if (h < 15) return 'Selamat siang';
+  if (h < 19) return 'Selamat sore';
+  return 'Selamat malam';
+}
+function formatIndoDateFull(){
+  const d = new Date();
+  return `${IDN_DAYS[d.getDay()]}, ${d.getDate()} ${IDN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+function donutGradient(segments){
+  const total = segments.reduce((s,x)=>s+x.value,0);
+  if (!total) return 'var(--surface-2)';
+  let acc = 0; const stops=[];
+  segments.forEach(seg=>{
+    const start = acc/total*360; acc += seg.value; const end = acc/total*360;
+    if (seg.value>0) stops.push(`${seg.color} ${start}deg ${end}deg`);
+  });
+  return `conic-gradient(${stops.join(',')})`;
+}
+function shortcutGoto(tab, openForm){
+  state.adminTab = tab;
+  if (openForm==='employee') state.empFormOpen = true;
+  if (openForm==='partner') state.partnerFormOpen = true;
+  if (openForm==='location') state.locFormOpen = true;
+  renderAdmin();
+}
+function setDashTab(key){ state.dashTab = key; renderAdmin(); }
+
+function adminDashboardHtml(){
+  const activeEmp = state.employees.filter(e=>e.status==='active').length;
+  const today = todayISO();
+  const todayRecords = state.attendance.filter(a=>a.date===today);
+  const hadirToday = todayRecords.filter(a=>a.status==='present').length;
+  const telatToday = todayRecords.filter(a=>a.status==='late').length;
+  const belumToday = Math.max(0, activeEmp - todayRecords.length);
+  const pendingLeave = state.leaves.filter(l=>l.status==='pending').length;
+  const lastRun = state.payrollRuns[state.payrollRuns.length-1];
+  const lastTotal = lastRun ? state.payrollItems.filter(i=>i.runId===lastRun.id).reduce((s,i)=>s+i.net,0) : 0;
+
+  const recentAtt = [...state.attendance].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const recentLeave = [...state.leaves].sort((a,b)=>b.id-a.id).slice(0,3);
+  const onLeaveToday = state.leaves.filter(l=>l.status==='approved' && l.start<=today && l.end>=today)
+    .map(l=>state.employees.find(e=>e.id===l.userId)).filter(Boolean);
+
+  // 7-day attendance trend
+  const trend = [];
+  for (let i=6; i>=0; i--){
+    const dt = new Date(); dt.setDate(dt.getDate()-i);
+    const iso = isoDate(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
+    trend.push({ label: IDN_DAYS[dt.getDay()].slice(0,3), count: state.attendance.filter(a=>a.date===iso).length });
+  }
+  const maxTrend = Math.max(1, ...trend.map(t=>t.count));
+
+  // branch distribution donut
+  const donutColors = ['#2557d6','#12a594','#8b5cf6','#ec6a5e'];
+  const locSegs = state.locations.map((l,i) => ({
+    name: l.name,
+    value: state.employees.filter(e=>e.locationId===l.id && e.status==='active').length,
+    color: donutColors[i % donutColors.length]
+  }));
+
+  const dashTab = state.dashTab || 'att';
+
+  return `
+    <div class="card hero">
+      <div class="hero-text">
+        <h2>${greetingWord()}, ${escapeHtml(state.settings.adminName || 'Admin')}!</h2>
+        <p class="date">${formatIndoDateFull()}</p>
+        <div class="shortcut-row">
+          <button class="btn btn-primary btn-sm" onclick="shortcutGoto('employees','employee')">+ Tambah Karyawan</button>
+          <button class="btn btn-ghost btn-sm" onclick="shortcutGoto('attendance')">Lihat Absensi</button>
+          <button class="btn btn-ghost btn-sm" onclick="shortcutGoto('leave')">Cuti Menunggu (${pendingLeave})</button>
+          <button class="btn btn-ghost btn-sm" onclick="shortcutGoto('payroll')">Buat Payroll</button>
+        </div>
+      </div>
+      <svg class="hero-deco" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="18" y="14" width="64" height="76" rx="8"/>
+        <path d="M32 32h36M32 46h36M32 60h22"/>
+        <circle cx="70" cy="72" r="14" fill="var(--bg)"/>
+        <path d="M64 72l4.5 4.5L77 67"/>
+      </svg>
+    </div>
+
+    <div class="widget-grid">
+      <div class="card widget">
+        <span class="label">Status Kehadiran Hari Ini</span>
+        <div class="bar-track">
+          <div class="bar-seg" style="width:${activeEmp?hadirToday/activeEmp*100:0}%;background:var(--success)"></div>
+          <div class="bar-seg" style="width:${activeEmp?telatToday/activeEmp*100:0}%;background:var(--warning)"></div>
+        </div>
+        <div class="bar-legend">
+          <span class="dot-row"><i style="background:var(--success)"></i> Hadir <b>${hadirToday}</b></span>
+          <span class="dot-row"><i style="background:var(--warning)"></i> Terlambat <b>${telatToday}</b></span>
+          <span class="dot-row"><i style="background:var(--border)"></i> Belum absen <b>${belumToday}</b></span>
+        </div>
+      </div>
+
+      <div class="card widget">
+        <span class="label">Tren Kehadiran 7 Hari</span>
+        <div class="trend-bars">
+          ${trend.map(t=>`<div class="tcol"><div class="tbar" style="height:${Math.max(6, t.count/maxTrend*100)}%" title="${t.count} hadir"></div><div class="tlabel">${t.label}</div></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card widget">
+        <span class="label">Distribusi Cabang</span>
+        <div class="donut-wrap">
+          <div class="donut" style="background:${donutGradient(locSegs)}"></div>
+          <div class="donut-legend">
+            ${locSegs.map(s=>`<span><i style="background:${s.color}"></i><span class="dn-name">${escapeHtml(s.name)}</span><b>${s.value}</b></span>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card widget">
+        <span class="label">Payroll Terakhir</span>
+        <div class="value" style="font-size:1.6rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;">${lastRun ? rupiah(lastTotal) : '—'}</div>
+        <p style="font-size:.76rem;color:var(--ink-soft);margin:8px 0 0;">${lastRun ? 'Periode '+fmtMonthYear(lastRun.month,lastRun.year) : 'Belum ada payroll dibuat'}</p>
+      </div>
+    </div>
+
+    <div class="dash-columns">
+      <div class="card" style="padding:16px 18px;">
+        <div class="mini-tabs">
+          <button class="${dashTab==='att'?'active':''}" onclick="setDashTab('att')">Absensi Terbaru</button>
+          <button class="${dashTab==='leave'?'active':''}" onclick="setDashTab('leave')">Cuti Terbaru</button>
+        </div>
+        ${dashTab==='att' ? (
+          recentAtt.length? recentAtt.map(a=>{
+            const emp = state.employees.find(e=>e.id===a.userId);
+            return `<div class="hist-row"><span>${escapeHtml(emp?.name||'-')}</span><span class="mono" style="color:var(--ink-soft)">${a.date}</span>${statusPill(a.status)}</div>`;
+          }).join('') : `<div class="empty">Belum ada aktivitas.</div>`
+        ) : (
+          recentLeave.length? recentLeave.map(l=>{
+            const emp = state.employees.find(e=>e.id===l.userId);
+            return `<div class="hist-row"><span>${escapeHtml(emp?.name||'-')} <span style="color:var(--ink-soft);text-transform:capitalize;">(${l.type})</span></span>${leavePill(l.status)}</div>`;
+          }).join('') : `<div class="empty">Belum ada pengajuan.</div>`
+        )}
+      </div>
+
+      <div>
+        <div class="card side-card">
+          <h3>Cuti Hari Ini</h3>
+          ${onLeaveToday.length? onLeaveToday.map(e=>`<div class="hist-row"><span>${escapeHtml(e.name)}</span></div>`).join('') : `<p style="font-size:.8rem;color:var(--ink-soft);margin:0;">Tidak ada karyawan yang cuti hari ini.</p>`}
+        </div>
+        <div class="card side-card">
+          <h3>Tautan Cepat</h3>
+          <button class="quick-link-btn" onclick="shortcutGoto('employees')">${ICONS.users}<span>Data Karyawan</span></button>
+          <button class="quick-link-btn" onclick="shortcutGoto('partners')">${ICONS.briefcase}<span>Data Mitra</span></button>
+          <button class="quick-link-btn" onclick="shortcutGoto('locations')">${ICONS.pin}<span>Lokasi &amp; Cabang</span></button>
+          <button class="quick-link-btn" onclick="shortcutGoto('payroll')">${ICONS.wallet}<span>Payroll</span></button>
+          <button class="quick-link-btn" onclick="shortcutGoto('settings')">${ICONS.gear}<span>Pengaturan</span></button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function statusPill(st){
+  if (st==='late') return `<span class="pill warn">Terlambat</span>`;
+  if (st==='present') return `<span class="pill ok">Hadir</span>`;
+  return `<span class="pill bad">Absen</span>`;
+}
+function leavePill(st){
+  if (st==='approved') return `<span class="pill ok">Disetujui</span>`;
+  if (st==='rejected') return `<span class="pill bad">Ditolak</span>`;
+  return `<span class="pill warn">Menunggu</span>`;
+}
+
+function locationOptions(selectedId){
+  return `<option value="">— Belum ditentukan —</option>` + state.locations.map(l =>
+    `<option value="${l.id}" ${selectedId===l.id?'selected':''}>${escapeHtml(l.name)}${l.status==='inactive'?' (nonaktif)':''}</option>`
+  ).join('');
+}
+function locationName(id){ const l = state.locations.find(x=>x.id===id); return l ? l.name : null; }
+
+const COMMISSION_TIERS = [20, 22, 30, 32, 60];
+function commissionOptions(selected){
+  return `<option value="">— Pilih persentase —</option>` + COMMISSION_TIERS.map(pct =>
+    `<option value="${pct}" ${Number(selected)===pct?'selected':''}>${pct}%</option>`
+  ).join('');
+}
+
+function employeeRowHtml(e){
+  const needsSalary = !e.baseSalary;
+  return `
+    <tr>
+      <td><b>${escapeHtml(e.name)}</b><div style="font-size:.75rem;color:var(--ink-soft)">${escapeHtml(e.email)}</div></td>
+      <td>${escapeHtml(e.position)}</td>
+      <td>${locationName(e.locationId) ? escapeHtml(locationName(e.locationId)) : '<span class="pill muted">Belum ada</span>'}</td>
+      <td class="num">${rupiah(e.baseSalary)}${needsSalary ? '<div><span class="pill warn" style="margin-top:3px;">Belum diatur</span></div>' : ''}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editEmployee(${e.id})">Edit</button>
+          <select onchange="reassignEmployee(${e.id}, this.value)" style="font-size:.76rem;padding:5px 8px;">${locationOptions(e.locationId)}</select>
+          <button class="btn btn-ghost btn-sm btn-toggle" onclick="toggleEmpStatus(${e.id})">${e.status==='active'?'Nonaktifkan':'Aktifkan'}</button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function setEmpStatusFilter(status){ state.empStatusFilter = status; renderAdmin(); }
+
+function adminEmployeesHtml(){
+  const locFilter = state.empLocationFilter || '';
+  const statusFilter = state.empStatusFilter || 'active';
+  const byLocation = locFilter ? state.employees.filter(e => String(e.locationId)===String(locFilter)) : state.employees;
+  const list = byLocation.filter(e => statusFilter==='active' ? e.status==='active' : e.status!=='active');
+  const activeCount = state.employees.filter(e=>e.status==='active').length;
+  const inactiveCount = state.employees.filter(e=>e.status!=='active').length;
+  const unassigned = state.employees.filter(e=>!e.locationId).length;
+  const needsSalarySetup = state.employees.filter(e=>e.status==='active' && !e.baseSalary).length;
+  const editing = state.editingEmployeeId ? state.employees.find(e=>e.id===state.editingEmployeeId) : null;
+  return `
+    <div class="section-title">
+      <h2>Data Karyawan</h2>
+      <button class="btn btn-primary btn-sm" onclick="toggleEmpForm()">+ Tambah Karyawan</button>
+    </div>
+    <div class="stat-grid">
+      <div class="card stat"><div class="label">Total Karyawan</div><div class="value">${state.employees.length}</div></div>
+      <div class="card stat"><div class="label">Aktif</div><div class="value">${activeCount}</div></div>
+      <div class="card stat"><div class="label">Belum Ditugaskan Cabang</div><div class="value">${unassigned}</div></div>
+    </div>
+    ${needsSalarySetup > 0 ? `<div class="notice" style="margin-block:0 16px;"><span>⚠️</span><span><b>${needsSalarySetup} karyawan</b> belum punya gaji pokok (biasanya akun yang mereka daftarkan sendiri lewat halaman Daftar). Klik <b>Edit</b> di baris karyawan untuk mengatur gaji pokok, tunjangan, dan cabangnya.</span></div>` : ''}
+    <div class="card" id="empFormCard" style="padding:16px 18px;margin-bottom:16px;" ${(editing || state.empFormOpen) ? '' : 'hidden'}>
+      <h3 style="margin:0 0 12px;font-size:.95rem;">${editing ? 'Edit Karyawan — ' + escapeHtml(editing.name) : 'Tambah Karyawan Baru'}</h3>
+      <input type="hidden" id="empEditId" value="${editing ? editing.id : ''}">
+      <div class="grid-3">
+        <div class="field"><label>Nama Lengkap</label><input type="text" id="newEmpName" placeholder="cth. Andi Wijaya" value="${editing?escapeHtml(editing.name):''}"></div>
+        <div class="field"><label>Posisi</label><input type="text" id="newEmpPos" placeholder="cth. Staff Gudang" value="${editing?escapeHtml(editing.position):''}"></div>
+        <div class="field"><label>Email</label><input type="email" id="newEmpEmail" placeholder="nama@klandestine.local" value="${editing?escapeHtml(editing.email):''}"></div>
+        <div class="field"><label>Gaji Pokok (Rp)</label><input type="number" id="newEmpSalary" value="${editing? editing.baseSalary : 4200000}"></div>
+        <div class="field"><label>Tunjangan (Rp)</label><input type="number" id="newEmpAllowance" value="${editing? editing.allowance : 250000}"></div>
+        <div class="field"><label>Cabang / Lokasi Kerja</label><select id="newEmpLocation">${locationOptions(editing?editing.locationId:null)}</select></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveEmployee()">${editing ? 'Simpan Perubahan' : 'Simpan Karyawan'}</button>
+        ${editing ? `<button class="btn btn-ghost btn-sm" onclick="cancelEmpForm()">Batal</button>` : ''}
+      </div>
+    </div>
+    <div class="selector-row">
+      <label style="margin:0;">Filter cabang</label>
+      <select onchange="state.empLocationFilter=this.value; renderAdmin();">
+        <option value="">Semua Cabang</option>
+        ${state.locations.map(l=>`<option value="${l.id}" ${String(locFilter)===String(l.id)?'selected':''}>${escapeHtml(l.name)}</option>`).join('')}
+      </select>
+      <div class="segmented" role="tablist" aria-label="Status karyawan">
+        <button class="${statusFilter==='active'?'active':''}" onclick="setEmpStatusFilter('active')">Karyawan Aktif (${activeCount})</button>
+        <button class="${statusFilter==='inactive'?'active':''}" onclick="setEmpStatusFilter('inactive')">Karyawan Nonaktif (${inactiveCount})</button>
+      </div>
+    </div>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Nama</th><th>Posisi</th><th>Cabang</th><th class="num">Gaji Pokok</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(employeeRowHtml).join('')}
+          ${list.length===0 ? `<tr><td colspan="5" class="empty">${statusFilter==='active' ? 'Tidak ada karyawan aktif di cabang ini.' : 'Belum ada karyawan nonaktif di cabang ini.'}</td></tr>` : ''}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function toggleEmpForm(){
+  state.editingEmployeeId = null;
+  state.empFormOpen = !state.empFormOpen;
+  renderAdmin();
+}
+function editEmployee(id){ state.editingEmployeeId = id; state.empFormOpen = true; renderAdmin(); }
+function cancelEmpForm(){ state.editingEmployeeId = null; state.empFormOpen = false; renderAdmin(); }
+
+function saveEmployee(){
+  const name = $('#newEmpName').value.trim();
+  if (!name){ toast('Isi nama karyawan dulu ya.'); return; }
+  const email = $('#newEmpEmail').value.trim() || `${name.split(' ')[0].toLowerCase()}@klandestine.local`;
+  const editId = state.editingEmployeeId;
+  if (state.employees.some(e=>e.email.toLowerCase()===email.toLowerCase() && e.id!==editId)){ toast('Email ini sudah dipakai karyawan lain.'); return; }
+  const position = $('#newEmpPos').value.trim() || 'Staff';
+  const baseSalary = parseInt($('#newEmpSalary').value)||0;
+  const allowance = parseInt($('#newEmpAllowance').value)||0;
+  const locationId = $('#newEmpLocation').value ? parseInt($('#newEmpLocation').value) : null;
+
+  if (editId){
+    const e = state.employees.find(x=>x.id===editId);
+    Object.assign(e, { name, email, position, baseSalary, allowance, locationId });
+    toast(`Data ${name} diperbarui.`);
+  } else {
+    const id = state.nextIds.user++;
+    state.employees.push({ id, name, email, password: 'karyawan123', position, baseSalary, allowance, locationId, status:'active' });
+    toast(`Karyawan baru ditambahkan. Password default: karyawan123`);
+  }
+  state.editingEmployeeId = null;
+  state.empFormOpen = false;
+  state.adminTab='employees';
+  renderAdmin();
+}
+function toggleEmpStatus(id){
+  const e = state.employees.find(x=>x.id===id);
+  e.status = e.status==='active' ? 'inactive' : 'active';
+  renderAdmin();
+}
+function reassignEmployee(id, locId){
+  const e = state.employees.find(x=>x.id===id);
+  e.locationId = locId ? parseInt(locId) : null;
+  toast(`${e.name} dipindah ke ${locationName(e.locationId) || 'belum ditentukan'}.`);
+  renderAdmin();
+}
+
+/* ---- Mitra (Partners) ---- */
+function partnerRowHtml(p){
+  const needsFee = !p.commissionPercent;
+  return `
+    <tr>
+      <td><b>${escapeHtml(p.name)}</b><div style="font-size:.75rem;color:var(--ink-soft)">${escapeHtml(p.email)}</div></td>
+      <td>${escapeHtml(p.position)}</td>
+      <td>${locationName(p.locationId) ? escapeHtml(locationName(p.locationId)) : '<span class="pill muted">Belum ada</span>'}</td>
+      <td class="num">${needsFee ? '<span class="pill warn">Belum diatur</span>' : `<b>${p.commissionPercent}%</b>`}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editPartner(${p.id})">Edit</button>
+          <select onchange="reassignPartner(${p.id}, this.value)" style="font-size:.76rem;padding:5px 8px;">${locationOptions(p.locationId)}</select>
+          <button class="btn btn-ghost btn-sm btn-toggle" onclick="togglePartnerStatus(${p.id})">${p.status==='active'?'Nonaktifkan':'Aktifkan'}</button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function setPartnerStatusFilter(status){ state.partnerStatusFilter = status; renderAdmin(); }
+
+function adminPartnersHtml(){
+  const locFilter = state.partnerLocationFilter || '';
+  const statusFilter = state.partnerStatusFilter || 'active';
+  const byLocation = locFilter ? state.partners.filter(p => String(p.locationId)===String(locFilter)) : state.partners;
+  const list = byLocation.filter(p => statusFilter==='active' ? p.status==='active' : p.status!=='active');
+  const activeCount = state.partners.filter(p=>p.status==='active').length;
+  const inactiveCount = state.partners.filter(p=>p.status!=='active').length;
+  const unassigned = state.partners.filter(p=>!p.locationId).length;
+  const editing = state.editingPartnerId ? state.partners.find(p=>p.id===state.editingPartnerId) : null;
+  return `
+    <div class="section-title">
+      <h2>Data Mitra</h2>
+      <button class="btn btn-primary btn-sm" onclick="togglePartnerForm()">+ Tambah Mitra</button>
+    </div>
+    <div class="stat-grid">
+      <div class="card stat"><div class="label">Total Mitra</div><div class="value">${state.partners.length}</div></div>
+      <div class="card stat"><div class="label">Aktif</div><div class="value">${activeCount}</div></div>
+      <div class="card stat"><div class="label">Belum Ditugaskan Cabang</div><div class="value">${unassigned}</div></div>
+    </div>
+    <div class="card" id="partnerFormCard" style="padding:16px 18px;margin-bottom:16px;" ${(editing || state.partnerFormOpen) ? '' : 'hidden'}>
+      <h3 style="margin:0 0 12px;font-size:.95rem;">${editing ? 'Edit Mitra — ' + escapeHtml(editing.name) : 'Tambah Mitra Baru'}</h3>
+      <input type="hidden" id="partnerEditId" value="${editing ? editing.id : ''}">
+      <div class="grid-3">
+        <div class="field"><label>Nama Mitra</label><input type="text" id="newPartnerName" placeholder="cth. CV Rekan Sablon Jaya" value="${editing?escapeHtml(editing.name):''}"></div>
+        <div class="field"><label>Posisi / Peran</label><input type="text" id="newPartnerPos" placeholder="cth. Mitra Reseller" value="${editing?escapeHtml(editing.position):''}"></div>
+        <div class="field"><label>Email</label><input type="email" id="newPartnerEmail" placeholder="nama@mitra.local" value="${editing?escapeHtml(editing.email):''}"></div>
+        <div class="field"><label>Komisi (%)</label><select id="newPartnerCommission">${commissionOptions(editing?editing.commissionPercent:null)}</select></div>
+        <div class="field"><label>Tunjangan (Rp)</label><input type="number" id="newPartnerAllowance" value="${editing? editing.allowance : 0}"></div>
+        <div class="field"><label>Cabang / Lokasi Kerja</label><select id="newPartnerLocation">${locationOptions(editing?editing.locationId:null)}</select></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="savePartner()">${editing ? 'Simpan Perubahan' : 'Simpan Mitra'}</button>
+        ${editing ? `<button class="btn btn-ghost btn-sm" onclick="cancelPartnerForm()">Batal</button>` : ''}
+      </div>
+    </div>
+    <div class="selector-row">
+      <label style="margin:0;">Filter cabang</label>
+      <select onchange="state.partnerLocationFilter=this.value; renderAdmin();">
+        <option value="">Semua Cabang</option>
+        ${state.locations.map(l=>`<option value="${l.id}" ${String(locFilter)===String(l.id)?'selected':''}>${escapeHtml(l.name)}</option>`).join('')}
+      </select>
+      <div class="segmented" role="tablist" aria-label="Status mitra">
+        <button class="${statusFilter==='active'?'active':''}" onclick="setPartnerStatusFilter('active')">Mitra Aktif (${activeCount})</button>
+        <button class="${statusFilter==='inactive'?'active':''}" onclick="setPartnerStatusFilter('inactive')">Mitra Nonaktif (${inactiveCount})</button>
+      </div>
+    </div>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Nama</th><th>Posisi</th><th>Cabang</th><th class="num">Komisi</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(partnerRowHtml).join('')}
+          ${list.length===0 ? `<tr><td colspan="5" class="empty">${statusFilter==='active' ? 'Tidak ada mitra aktif di cabang ini.' : 'Belum ada mitra nonaktif di cabang ini.'}</td></tr>` : ''}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function togglePartnerForm(){
+  state.editingPartnerId = null;
+  state.partnerFormOpen = !state.partnerFormOpen;
+  renderAdmin();
+}
+function editPartner(id){ state.editingPartnerId = id; state.partnerFormOpen = true; renderAdmin(); }
+function cancelPartnerForm(){ state.editingPartnerId = null; state.partnerFormOpen = false; renderAdmin(); }
+
+function savePartner(){
+  const name = $('#newPartnerName').value.trim();
+  if (!name){ toast('Isi nama mitra dulu ya.'); return; }
+  const email = $('#newPartnerEmail').value.trim() || `${name.split(' ')[0].toLowerCase()}@mitra.local`;
+  const editId = state.editingPartnerId;
+  if (state.partners.some(p=>p.email.toLowerCase()===email.toLowerCase() && p.id!==editId)){ toast('Email ini sudah dipakai mitra lain.'); return; }
+  const position = $('#newPartnerPos').value.trim() || 'Mitra';
+  const commissionPercent = $('#newPartnerCommission').value ? parseInt($('#newPartnerCommission').value) : 0;
+  const allowance = parseInt($('#newPartnerAllowance').value)||0;
+  const locationId = $('#newPartnerLocation').value ? parseInt($('#newPartnerLocation').value) : null;
+
+  if (editId){
+    const p = state.partners.find(x=>x.id===editId);
+    Object.assign(p, { name, email, position, commissionPercent, allowance, locationId });
+    toast(`Data ${name} diperbarui.`);
+  } else {
+    const id = state.nextIds.partner++;
+    state.partners.push({ id, name, email, position, commissionPercent, allowance, locationId, status:'active' });
+    toast(`Mitra baru ditambahkan.`);
+  }
+  state.editingPartnerId = null;
+  state.partnerFormOpen = false;
+  state.adminTab='partners';
+  renderAdmin();
+}
+function togglePartnerStatus(id){
+  const p = state.partners.find(x=>x.id===id);
+  p.status = p.status==='active' ? 'inactive' : 'active';
+  renderAdmin();
+}
+function reassignPartner(id, locId){
+  const p = state.partners.find(x=>x.id===id);
+  p.locationId = locId ? parseInt(locId) : null;
+  toast(`${p.name} dipindah ke ${locationName(p.locationId) || 'belum ditentukan'}.`);
+  renderAdmin();
+}
+
+/* ---- Locations / Branches ---- */
+function adminLocationsHtml(){
+  const editing = state.editingLocationId ? state.locations.find(l=>l.id===state.editingLocationId) : null;
+  return `
+    <div class="section-title">
+      <h2>Lokasi &amp; Cabang</h2>
+      <button class="btn btn-primary btn-sm" onclick="toggleLocForm()">+ Tambah Cabang</button>
+    </div>
+    <p style="font-size:.82rem;color:var(--ink-soft);max-width:640px;margin:-4px 0 16px;">Tiap cabang punya koordinat &amp; radius absen sendiri. Karyawan ditugaskan ke satu cabang lewat dropdown di kolom kanan tabel Karyawan — saat absen, lokasi mereka dicek terhadap cabang yang ditugaskan, bukan satu titik kantor tunggal.</p>
+    <div class="card" id="locFormCard" style="padding:16px 18px;margin-bottom:16px;" ${(editing || state.locFormOpen) ? '' : 'hidden'}>
+      <input type="hidden" id="locEditId" value="${editing ? editing.id : ''}">
+      <div class="grid-3">
+        <div class="field"><label>Nama Cabang</label><input type="text" id="locName" placeholder="cth. Toko Kemang" value="${editing?escapeHtml(editing.name):''}"></div>
+        <div class="field"><label>Alamat (opsional)</label><input type="text" id="locAddress" value="${editing?escapeHtml(editing.address||''):''}"></div>
+        <div class="field"><label>Radius (meter)</label><input type="number" id="locRadius" value="${editing?editing.radiusM:150}"></div>
+        <div class="field"><label>Latitude</label><input type="text" id="locLat" placeholder="-6.200000" value="${editing?editing.lat:''}"></div>
+        <div class="field"><label>Longitude</label><input type="text" id="locLng" placeholder="106.816666" value="${editing?editing.lng:''}"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveLocation()">${editing?'Simpan Perubahan':'Simpan Cabang'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelLocForm()">Batal</button>
+      </div>
+    </div>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Nama Cabang</th><th>Alamat</th><th>Koordinat</th><th>Radius</th><th>Karyawan</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${state.locations.map(l => {
+            const count = state.employees.filter(e=>e.locationId===l.id && e.status==='active').length;
+            return `<tr>
+              <td><b>${escapeHtml(l.name)}</b></td>
+              <td style="color:var(--ink-soft);">${escapeHtml(l.address||'-')}</td>
+              <td class="mono" style="font-size:.76rem;color:var(--ink-soft);">${l.lat}, ${l.lng}</td>
+              <td>${l.radiusM} m</td>
+              <td>${count} aktif</td>
+              <td><span class="pill ${l.status==='active'?'ok':'muted'}">${l.status==='active'?'Aktif':'Nonaktif'}</span></td>
+              <td style="display:flex;gap:6px;">
+                <button class="btn btn-ghost btn-sm" onclick="editLocation(${l.id})">Edit</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleLocStatus(${l.id})">${l.status==='active'?'Nonaktifkan':'Aktifkan'}</button>
+              </td>
+            </tr>`;
+          }).join('')}
+          ${state.locations.length===0 ? `<tr><td colspan="7" class="empty">Belum ada cabang. Tambahkan cabang pertama.</td></tr>` : ''}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function toggleLocForm(){ state.editingLocationId=null; state.locFormOpen=!state.locFormOpen; renderAdmin(); }
+function cancelLocForm(){ state.editingLocationId=null; state.locFormOpen=false; renderAdmin(); }
+function editLocation(id){ state.editingLocationId = id; state.locFormOpen = true; renderAdmin(); }
+function saveLocation(){
+  const name = $('#locName').value.trim();
+  const lat = parseFloat($('#locLat').value), lng = parseFloat($('#locLng').value);
+  const radiusM = parseInt($('#locRadius').value)||150;
+  const address = $('#locAddress').value.trim();
+  if (!name || Number.isNaN(lat) || Number.isNaN(lng)){ toast('Nama, latitude, dan longitude wajib diisi.'); return; }
+  const editId = state.editingLocationId;
+  if (editId){
+    const l = state.locations.find(x=>x.id===editId);
+    Object.assign(l, { name, address, lat, lng, radiusM });
+    toast('Cabang diperbarui.');
+  } else {
+    state.locations.push({ id: state.nextIds.loc++, name, address, lat, lng, radiusM, status:'active' });
+    toast('Cabang baru ditambahkan.');
+  }
+  state.editingLocationId = null;
+  state.locFormOpen = false;
+  renderAdmin();
+}
+function toggleLocStatus(id){
+  const l = state.locations.find(x=>x.id===id);
+  l.status = l.status==='active' ? 'inactive' : 'active';
+  renderAdmin();
+}
+
+function adminAttendanceHtml(){
+  const date = state.attDate || todayISO();
+  const locFilter = state.attLocationFilter || '';
+  let rows = state.attendance.filter(a=>a.date===date);
+  let activeEmp = state.employees.filter(e=>e.status==='active');
+  if (locFilter){
+    rows = rows.filter(a=>{ const emp = state.employees.find(e=>e.id===a.userId); return emp && String(emp.locationId)===String(locFilter); });
+    activeEmp = activeEmp.filter(e=>String(e.locationId)===String(locFilter));
+  }
+  const presentIds = new Set(rows.map(r=>r.userId));
+  const absentees = activeEmp.filter(e=>!presentIds.has(e.id));
+  const hadirCount = rows.filter(a=>a.status==='present').length;
+  const telatCount = rows.filter(a=>a.status==='late').length;
+  return `
+    <div class="section-title">
+      <h2>Absensi Harian</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select onchange="state.attLocationFilter=this.value; renderAdmin();" style="width:auto;">
+          <option value="">Semua Cabang</option>
+          ${state.locations.map(l=>`<option value="${l.id}" ${String(locFilter)===String(l.id)?'selected':''}>${escapeHtml(l.name)}</option>`).join('')}
+        </select>
+        <input type="date" value="${date}" onchange="state.attDate=this.value; renderAdmin();" style="width:auto;">
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="card stat"><div class="label">Hadir</div><div class="value">${hadirCount}</div></div>
+      <div class="card stat"><div class="label">Terlambat</div><div class="value">${telatCount}</div></div>
+      <div class="card stat"><div class="label">Belum Absen</div><div class="value">${absentees.length}</div></div>
+    </div>
+    <div class="card table-wrap" style="margin-bottom:18px;">
+      <table>
+        <thead><tr><th>Nama</th><th>Cabang</th><th>Masuk</th><th>Pulang</th><th>Foto</th><th>Status</th></tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(a=>{
+            const emp = state.employees.find(e=>e.id===a.userId);
+            return `<tr><td><b>${escapeHtml(emp?.name||'-')}</b></td><td style="color:var(--ink-soft);">${locationName(emp?.locationId)||'—'}</td><td class="mono">${a.clockIn||'-'}</td><td class="mono">${a.clockOut||'-'}</td><td><div style="display:flex;gap:6px;">${selfieThumbHtml(a.id,'in',a.selfieIn)}${selfieThumbHtml(a.id,'out',a.selfieOut)}${(!a.selfieIn && !a.selfieOut) ? '<span class="pill muted">-</span>' : ''}</div></td><td>${statusPill(a.status)}</td></tr>`;
+          }).join('') : `<tr><td colspan="6" class="empty">Belum ada yang absen di tanggal ini.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <h3 style="font-size:1rem;margin-bottom:8px;">Belum Absen (${absentees.length})</h3>
+    <div class="card" style="padding:14px 16px;">
+      ${absentees.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${absentees.map(e=>`<span class="pill muted">${escapeHtml(e.name)}${locationName(e.locationId)?' · '+escapeHtml(locationName(e.locationId)):''}</span>`).join('')}</div>` : `<div class="empty">Semua karyawan aktif sudah absen.</div>`}
+    </div>
+  `;
+}
+
+function adminLeaveHtml(){
+  const rows = [...state.leaves].sort((a,b)=> (a.status==='pending'?0:1) - (b.status==='pending'?0:1) || b.id-a.id);
+  const pendingCount = state.leaves.filter(l=>l.status==='pending').length;
+  const approvedCount = state.leaves.filter(l=>l.status==='approved').length;
+  const rejectedCount = state.leaves.filter(l=>l.status==='rejected').length;
+  return `
+    <div class="section-title"><h2>Persetujuan Cuti &amp; Izin</h2></div>
+    <div class="stat-grid">
+      <div class="card stat"><div class="label">Menunggu</div><div class="value">${pendingCount}</div></div>
+      <div class="card stat"><div class="label">Disetujui</div><div class="value">${approvedCount}</div></div>
+      <div class="card stat"><div class="label">Ditolak</div><div class="value">${rejectedCount}</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${rows.length ? rows.map(l=>{
+        const emp = state.employees.find(e=>e.id===l.userId);
+        return `
+        <div class="card" style="padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div>
+            <div><b>${escapeHtml(emp?.name||'-')}</b> <span style="color:var(--ink-soft);text-transform:capitalize;font-size:.85rem;">(${l.type})</span></div>
+            <div class="mono" style="font-size:.8rem;color:var(--ink-soft);">${l.start} s/d ${l.end}</div>
+            ${l.reason?`<div style="font-size:.8rem;color:var(--ink-soft);margin-top:2px;">${escapeHtml(l.reason)}</div>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${leavePill(l.status)}
+            ${l.status==='pending' ? `
+              <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success);" onclick="decideLeave(${l.id},'approved')">Setujui</button>
+              <button class="btn btn-sm btn-danger" onclick="decideLeave(${l.id},'rejected')">Tolak</button>
+            ` : ''}
+          </div>
+        </div>`;
+      }).join('') : `<div class="empty">Belum ada pengajuan cuti/izin.</div>`}
+    </div>
+  `;
+}
+function decideLeave(id, status){
+  const l = state.leaves.find(x=>x.id===id);
+  l.status = status;
+  toast(status==='approved' ? 'Cuti disetujui.' : 'Cuti ditolak.');
+  renderAdmin();
+}
+
+function adminPayrollHtml(){
+  const t = todayParts();
+  if (state.viewingRunId){
+    const run = state.payrollRuns.find(r=>r.id===state.viewingRunId);
+    const items = state.payrollItems.filter(i=>i.runId===run.id);
+    const totalNet = items.reduce((s,i)=>s+i.net,0);
+    return `
+      <button class="btn btn-ghost btn-sm" style="margin-bottom:14px;" onclick="state.viewingRunId=null; renderAdmin();">&larr; Kembali</button>
+      <div class="section-title">
+        <h2>Payroll ${fmtMonthYear(run.month, run.year)}</h2>
+        <div style="font-size:.85rem;color:var(--ink-soft);">Total: <b style="color:var(--ink);">${rupiah(totalNet)}</b></div>
+      </div>
+      <div class="disclaimer">Estimasi BPJS &amp; PPh 21 dihitung otomatis dari persentase di Pengaturan — bukan perhitungan pajak resmi. Verifikasi ke akuntan sebelum dipakai untuk slip gaji resmi.</div>
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th class="num">Pokok</th><th class="num">Tunjangan</th><th class="num">Lembur</th><th class="num">Pot. Telat</th><th class="num">Pot. Absen</th><th class="num">BPJS</th><th class="num">PPh21</th><th class="num">Bersih</th></tr></thead>
+          <tbody>
+            ${items.map(i=>{
+              const emp = state.employees.find(e=>e.id===i.userId);
+              return `<tr>
+                <td><b>${escapeHtml(emp?.name||'-')}</b></td>
+                <td class="num">${Math.round(i.base).toLocaleString('id-ID')}</td>
+                <td class="num">${Math.round(i.allowance).toLocaleString('id-ID')}</td>
+                <td class="num">${Math.round(i.overtime).toLocaleString('id-ID')}</td>
+                <td class="num" style="color:var(--danger);">-${Math.round(i.lateDed).toLocaleString('id-ID')}</td>
+                <td class="num" style="color:var(--danger);">-${Math.round(i.absenceDed).toLocaleString('id-ID')}</td>
+                <td class="num" style="color:var(--danger);">-${Math.round(i.bpjsKes+i.bpjsJht+i.bpjsJp).toLocaleString('id-ID')}</td>
+                <td class="num" style="color:var(--danger);">-${Math.round(i.pph21).toLocaleString('id-ID')}</td>
+                <td class="num" style="font-weight:700;">${Math.round(i.net).toLocaleString('id-ID')}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="section-title"><h2>Payroll</h2></div>
+    <div class="card" style="padding:16px 18px;margin-bottom:18px;max-width:420px;">
+      <h3 style="margin:0 0 10px;font-size:1rem;">Generate Payroll Bulan Ini</h3>
+      <p style="font-size:.8rem;color:var(--ink-soft);margin:0 0 12px;">Menghitung ${fmtMonthYear(t.m,t.y)} dari data absensi &amp; cuti sampai hari ini.</p>
+      <button class="btn btn-primary" onclick="generatePayroll()">Generate ${fmtMonthYear(t.m,t.y)}</button>
+    </div>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Periode</th><th>Dibuat</th><th></th></tr></thead>
+        <tbody>
+          ${state.payrollRuns.length ? [...state.payrollRuns].reverse().map(r=>`
+            <tr><td><b>${fmtMonthYear(r.month,r.year)}</b></td><td class="mono" style="color:var(--ink-soft);">${r.generatedAt}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="state.viewingRunId=${r.id}; renderAdmin();">Lihat detail</button></td></tr>
+          `).join('') : `<tr><td colspan="3" class="empty">Belum ada payroll dibuat.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function generatePayroll(){
+  const t = todayParts();
+  let run = state.payrollRuns.find(r=>r.month===t.m && r.year===t.y);
+  if (!run){ run = { id: state.nextIds.run++, month:t.m, year:t.y, generatedAt: todayISO()+' '+new Date().toTimeString().slice(0,5) }; state.payrollRuns.push(run); }
+  else { run.generatedAt = todayISO()+' '+new Date().toTimeString().slice(0,5); }
+  state.payrollItems = state.payrollItems.filter(i=>i.runId!==run.id);
+  state.employees.forEach(emp => state.payrollItems.push(calcPayroll(emp, t.m, t.y, run.id)));
+  toast('Payroll bulan ini berhasil dibuat.');
+  state.viewingRunId = run.id;
+  renderAdmin();
+}
+
+function adminSettingsHtml(){
+  const s = state.settings;
+  return `
+    <div class="section-title"><h2>Pengaturan</h2></div>
+    <div class="card" style="padding:18px 20px;max-width:640px;display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <label>Nama Perusahaan</label>
+        <input type="text" id="setCompany" value="${escapeHtml(s.companyName)}">
+      </div>
+      <div>
+        <h3 style="font-size:.9rem;margin:0 0 10px;">Jam Kerja</h3>
+        <div class="grid-3">
+          <div class="field"><label>Jam Masuk</label><input type="time" id="setStart" value="${s.workStart}"></div>
+          <div class="field"><label>Jam Pulang</label><input type="time" id="setEnd" value="${s.workEnd}"></div>
+          <div class="field"><label>Toleransi Telat (menit)</label><input type="number" id="setTolerance" value="${s.lateTolerance}"></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:.9rem;margin:0 0 10px;">Geofencing (Multi-Cabang)</h3>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:500;color:var(--ink);margin-bottom:10px;">
+          <input type="checkbox" id="setGeofence" style="width:auto;" ${s.enforceGeofence?'checked':''}> Wajibkan karyawan absen di sekitar lokasi cabang mereka
+        </label>
+        <p style="font-size:.78rem;color:var(--ink-soft);background:var(--surface-2);border-radius:9px;padding:10px 12px;margin:0;">
+          Koordinat &amp; radius diatur per cabang di tab <a href="#" onclick="state.adminTab='locations'; renderAdmin(); return false;" style="color:var(--accent);font-weight:600;">Lokasi &amp; Cabang</a> — jadi berapa pun jumlah cabang kamu, tiap lokasi punya batas absen sendiri, dan tiap karyawan hanya dicek terhadap cabang yang ditugaskan ke mereka.
+        </p>
+      </div>
+      <div>
+        <h3 style="font-size:.9rem;margin:0 0 10px;">Verifikasi Selfie</h3>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:500;color:var(--ink);margin-bottom:10px;">
+          <input type="checkbox" id="setSelfie" style="width:auto;" ${s.requireSelfie?'checked':''}> Wajibkan karyawan ambil foto selfie setiap absen masuk &amp; pulang
+        </label>
+        <p style="font-size:.78rem;color:var(--ink-soft);background:var(--surface-2);border-radius:9px;padding:10px 12px;margin:0;">
+          Kalau aktif, karyawan harus ambil foto lewat kamera (atau upload dari galeri kalau kameranya tidak bisa diakses) sebelum absen masuk/pulang tersimpan. Foto bisa dilihat admin di tab Absensi untuk memastikan yang absen benar orangnya sendiri, bukan dititipkan.
+        </p>
+      </div>
+      <div>
+        <h3 style="font-size:.9rem;margin:0 0 10px;">Payroll</h3>
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div class="field"><label>Hari Kerja / Bulan (pembagi)</label><input type="number" id="setWorkingDays" value="${s.workingDaysPerMonth}"></div>
+          <div class="field"><label>Pengali Lembur</label><input type="number" step="0.1" id="setOvertime" value="${s.overtimeMultiplier}"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>BPJS Kesehatan (%)</label><input type="number" step="0.1" id="setBpjsKes" value="${s.bpjsKesehatan}"></div>
+          <div class="field"><label>BPJS JHT (%)</label><input type="number" step="0.1" id="setBpjsJht" value="${s.bpjsJht}"></div>
+          <div class="field"><label>BPJS JP (%)</label><input type="number" step="0.1" id="setBpjsJp" value="${s.bpjsJp}"></div>
+          <div class="field"><label>Estimasi PPh 21 (%)</label><input type="number" step="0.1" id="setTax" value="${s.taxPercent}"></div>
+        </div>
+        <div class="disclaimer">Persentase di atas dipakai apa adanya untuk estimasi. Bukan pengganti perhitungan pajak resmi (PPh 21 punya skema berjenjang/TER) — konsultasikan ke akuntan.</div>
+      </div>
+      <div><button class="btn btn-primary" onclick="saveSettings()">Simpan Pengaturan</button></div>
+    </div>
+  `;
+}
+function saveSettings(){
+  const s = state.settings;
+  s.companyName = $('#setCompany').value || s.companyName;
+  s.workStart = $('#setStart').value; s.workEnd = $('#setEnd').value;
+  s.lateTolerance = parseInt($('#setTolerance').value)||0;
+  s.enforceGeofence = $('#setGeofence').checked;
+  s.requireSelfie = $('#setSelfie').checked;
+  s.workingDaysPerMonth = parseInt($('#setWorkingDays').value)||22;
+  s.overtimeMultiplier = parseFloat($('#setOvertime').value)||1.5;
+  s.bpjsKesehatan = parseFloat($('#setBpjsKes').value)||0;
+  s.bpjsJht = parseFloat($('#setBpjsJht').value)||0;
+  s.bpjsJp = parseFloat($('#setBpjsJp').value)||0;
+  s.taxPercent = parseFloat($('#setTax').value)||0;
+  toast('Pengaturan disimpan untuk sesi ini.');
+}
+function wireAdminEvents(){}
+
+/* =========================================================
+   EMPLOYEE VIEW — auth (login/register) + dashboard
+   ========================================================= */
+const EMP_TABS = [['home','Beranda'],['attendance','Absensi'],['leave','Cuti'],['payslip','Gaji']];
+
+function switchAuthView(v){ state.authView = v; state.authError = null; renderEmployee(); }
+
+function showAuthError(msg){
+  state.authError = msg;
+  const box = $('#authErrorBox');
+  if (box){ box.textContent = msg; box.hidden = false; } else { renderEmployee(); }
+}
+
+function employeeLoginHtml(){
+  const demoList = state.employees.slice(0,3).map(e=>e.email).join(', ');
+  return `
+    <div class="auth-wrap">
+      <div class="card auth-card">
+        <h2>Masuk sebagai Karyawan</h2>
+        <p class="auth-sub">Masukkan email &amp; password akun kamu untuk absen.</p>
+        <div class="auth-error" id="authErrorBox" ${state.authError ? '' : 'hidden'}>${state.authError ? escapeHtml(state.authError) : ''}</div>
+        <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="nama@klandestine.local"></div>
+        <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+        <button class="btn btn-primary big-btn" onclick="doEmployeeLogin()">Masuk</button>
+        <p class="auth-hint">Coba demo: ${escapeHtml(demoList)} — password <b>karyawan123</b> untuk semua akun contoh.</p>
+        <p class="auth-switch">Belum punya akun? <a href="#" onclick="switchAuthView('register');return false;">Daftar di sini</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function employeeRegisterHtml(){
+  return `
+    <div class="auth-wrap">
+      <div class="card auth-card">
+        <h2>Daftar Akun Karyawan</h2>
+        <p class="auth-sub">Buat akun sendiri untuk mulai absen. Admin akan menugaskan cabang &amp; gaji pokok kamu lewat menu Karyawan.</p>
+        <div class="auth-error" id="authErrorBox" ${state.authError ? '' : 'hidden'}>${state.authError ? escapeHtml(state.authError) : ''}</div>
+        <div class="field"><label>Nama Lengkap</label><input type="text" id="regName" placeholder="Nama kamu"></div>
+        <div class="field"><label>Posisi</label><input type="text" id="regPosition" placeholder="cth. Staff Gudang"></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="nama@email.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="regPassword" placeholder="Minimal 6 karakter"></div>
+        <div class="field"><label>Konfirmasi Password</label><input type="password" id="regPassword2" placeholder="Ulangi password"></div>
+        <button class="btn btn-primary big-btn" onclick="doEmployeeRegister()">Daftar</button>
+        <p class="auth-switch">Sudah punya akun? <a href="#" onclick="switchAuthView('login');return false;">Masuk di sini</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function doEmployeeLogin(){
+  const email = ($('#loginEmail').value||'').trim().toLowerCase();
+  const pass = $('#loginPassword').value||'';
+  if (!email || !pass){ showAuthError('Isi email dan password dulu.'); return; }
+  const emp = state.employees.find(e=>e.email.toLowerCase()===email);
+  if (!emp){ showAuthError('Email tidak ditemukan.'); return; }
+  if (emp.status!=='active'){ showAuthError('Akun ini sudah dinonaktifkan. Hubungi admin.'); return; }
+  if (emp.password !== pass){ showAuthError('Password salah.'); return; }
+  state.authError = null;
+  state.loggedInEmployeeId = emp.id;
+  state.currentEmployeeId = emp.id;
+  state.employeeTab = 'home';
+  toast(`Selamat datang, ${emp.name.split(' ')[0]}!`);
+  renderEmployee();
+}
+
+function doEmployeeRegister(){
+  const name = ($('#regName').value||'').trim();
+  const email = ($('#regEmail').value||'').trim().toLowerCase();
+  const position = ($('#regPosition').value||'').trim() || 'Staff';
+  const pass = $('#regPassword').value||'';
+  const pass2 = $('#regPassword2').value||'';
+  if (!name || !email || !pass){ showAuthError('Nama, email, dan password wajib diisi.'); return; }
+  if (pass.length < 6){ showAuthError('Password minimal 6 karakter.'); return; }
+  if (pass !== pass2){ showAuthError('Konfirmasi password tidak cocok.'); return; }
+  if (state.employees.some(e=>e.email.toLowerCase()===email)){ showAuthError('Email ini sudah terdaftar. Coba masuk.'); return; }
+  const id = state.nextIds.user++;
+  state.employees.push({ id, name, email, password: pass, position, baseSalary:0, allowance:0, locationId:null, status:'active' });
+  state.authError = null;
+  state.loggedInEmployeeId = id;
+  state.currentEmployeeId = id;
+  state.employeeTab = 'home';
+  toast('Akun berhasil dibuat. Selamat datang!');
+  renderEmployee();
+}
+
+function employeeLogout(){
+  state.loggedInEmployeeId = null;
+  state.authView = 'login';
+  state.authError = null;
+  toast('Berhasil keluar.');
+  renderEmployee();
+}
+
+function employeePhoneShellHtml(){
+  return `
+    <div class="phone-stage">
+      <div class="phone">
+        <div class="phone-head">
+          <div id="phoneHeadContent"></div>
+        </div>
+        <div class="phone-body" id="phoneBody"></div>
+        <div class="phone-nav" id="phoneNav"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEmployee(){
+  const area = $('#employeeArea');
+  const emp = state.loggedInEmployeeId ? state.employees.find(e=>e.id===state.loggedInEmployeeId) : null;
+
+  if (!emp || emp.status!=='active'){
+    if (state.loggedInEmployeeId && (!emp || emp.status!=='active')){
+      state.loggedInEmployeeId = null;
+      state.authView = 'login';
+    }
+    area.innerHTML = state.authView==='register' ? employeeRegisterHtml() : employeeLoginHtml();
+    return;
+  }
+
+  area.innerHTML = employeePhoneShellHtml();
+  $('#phoneHeadContent').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+      <div><div class="greet">Halo,</div><div class="who">${escapeHtml(emp.name)} 👋</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="employeeLogout()" style="flex:none;">Keluar</button>
+    </div>
+  `;
+  $('#phoneNav').innerHTML = EMP_TABS.map(([k,l])=>`<button class="${state.employeeTab===k?'active':''}" onclick="setEmpTab('${k}')">${l}</button>`).join('');
+  const body = $('#phoneBody');
+  if (state.employeeTab==='home') body.innerHTML = empHomeHtml(emp);
+  else if (state.employeeTab==='attendance') body.innerHTML = empAttendanceHtml(emp);
+  else if (state.employeeTab==='leave') body.innerHTML = empLeaveHtml(emp);
+  else if (state.employeeTab==='payslip') body.innerHTML = empPayslipHtml(emp);
+}
+function setEmpTab(k){ state.employeeTab = k; state.viewingPayslip = null; renderEmployee(); }
+
+function todaysAttendance(userId){ return state.attendance.find(a=>a.userId===userId && a.date===todayISO()); }
+
+function empHomeHtml(emp){
+  const att = todaysAttendance(emp.id);
+  const s = state.settings;
+  const myLoc = emp.locationId ? state.locations.find(l=>l.id===emp.locationId) : null;
+  const recent = state.attendance.filter(a=>a.userId===emp.id).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+  return `
+    <div class="clock-tiles">
+      <div class="clock-tile"><div class="t-label">Absen Masuk</div><div class="t-value">${att?.clockIn || '--:--'}</div>${att?.status==='late'?'<span class="pill warn" style="margin-top:4px;">Terlambat</span>':''}</div>
+      <div class="clock-tile"><div class="t-label">Absen Pulang</div><div class="t-value">${att?.clockOut || '--:--'}</div></div>
+    </div>
+    <button class="btn btn-primary big-btn" id="btnClockIn" ${att?.clockIn?'disabled':''} onclick="startClockIn(${emp.id})">Absen Masuk</button>
+    <button class="btn btn-ghost big-btn" id="btnClockOut" ${(!att?.clockIn || att?.clockOut)?'disabled':''} onclick="startClockOut(${emp.id})">Absen Pulang</button>
+    <p style="text-align:center;font-size:.72rem;color:var(--ink-soft);margin:8px 0 4px;">Jam kerja: ${s.workStart} - ${s.workEnd}</p>
+    ${myLoc
+      ? `<p style="text-align:center;font-size:.72rem;color:var(--ink-soft);margin:0 0 12px;">Cabang: <span style="color:var(--ink);font-weight:600;">${escapeHtml(myLoc.name)}</span>${s.enforceGeofence?` · radius ${myLoc.radiusM}m`:''}</p>`
+      : `<p style="text-align:center;font-size:.72rem;color:var(--warning);margin:0 0 12px;">Belum ditugaskan ke cabang manapun.</p>`}
+    ${s.enforceGeofence && myLoc ? `<p style="font-size:.7rem;color:var(--ink-soft);background:var(--surface-2);border-radius:8px;padding:8px 10px;margin:0 0 14px;">Geofencing aktif — tombol di atas memakai lokasi GPS asli perangkatmu, dicek terhadap koordinat ${escapeHtml(myLoc.name)}. Kalau device kamu nggak benar-benar di sana, absen akan ditolak (itu tandanya fiturnya bekerja). Matikan geofencing di tab Pengaturan kalau mau coba bebas.</p>` : ''}
+    ${s.requireSelfie ? `<p style="font-size:.7rem;color:var(--ink-soft);background:var(--surface-2);border-radius:8px;padding:8px 10px;margin:0 0 14px;">📸 Selfie wajib — kamera akan terbuka saat kamu tekan Absen Masuk/Pulang untuk memverifikasi kamu absen sendiri.</p>` : ''}
+    <h3 style="font-size:.85rem;margin:0 0 8px;">Riwayat Terbaru</h3>
+    ${recent.length ? recent.map(a=>`<div class="hist-row"><span class="mono" style="color:var(--ink-soft)">${a.date}</span><span class="mono">${a.clockIn||'--:--'}–${a.clockOut||'--:--'}</span><div style="display:flex;align-items:center;gap:6px;">${selfieThumbHtml(a.id,'in',a.selfieIn)}${selfieThumbHtml(a.id,'out',a.selfieOut)}${statusPill(a.status)}</div></div>`).join('') : `<div class="empty">Belum ada riwayat.</div>`}
+  `;
+}
+
+function selfieThumbHtml(attId, field, url){
+  if (!url) return '';
+  const label = field==='in' ? 'Foto absen masuk' : 'Foto absen pulang';
+  return `<img src="${url}" class="selfie-thumb" title="${label}" alt="${label}" onclick="viewSelfieFor(${attId},'${field}')">`;
+}
+function viewSelfieFor(attId, field){
+  const att = state.attendance.find(a=>a.id===attId);
+  if (!att) return;
+  viewSelfiePhoto(field==='in' ? att.selfieIn : att.selfieOut);
+}
+function viewSelfiePhoto(url){
+  if (!url) return;
+  $('#photoViewerImg').src = url;
+  $('#photoViewer').hidden = false;
+}
+function closePhotoViewer(){
+  $('#photoViewer').hidden = true;
+  $('#photoViewerImg').src = '';
+}
+
+function withLocation(cb){
+  if (!navigator.geolocation){ cb(null); return; }
+  let done = false;
+  const timer = setTimeout(()=>{ if(!done){ done=true; cb(null); } }, 3000);
+  try{
+    navigator.geolocation.getCurrentPosition(
+      pos => { if(done) return; done=true; clearTimeout(timer); cb({lat:pos.coords.latitude,lng:pos.coords.longitude}); },
+      () => { if(done) return; done=true; clearTimeout(timer); cb(null); },
+      { timeout: 2800 }
+    );
+  } catch(e){ if(!done){ done=true; clearTimeout(timer); cb(null); } }
+}
+
+function startClockIn(userId){
+  if (state.settings.requireSelfie){ openSelfieCapture('in', userId); }
+  else { doClockIn(userId, null); }
+}
+function startClockOut(userId){
+  const att = todaysAttendance(userId);
+  if (!att || !att.clockIn){ toast('Kamu belum absen masuk.'); return; }
+  if (state.settings.requireSelfie){ openSelfieCapture('out', userId); }
+  else { doClockOut(userId, null); }
+}
+
+function doClockIn(userId, selfie){
+  if (state.settings.requireSelfie && !selfie){ toast('Selfie wajib untuk absen masuk.'); return; }
+  withLocation(loc => {
+    const s = state.settings;
+    const emp = state.employees.find(e=>e.id===userId);
+    const myLoc = emp && emp.locationId ? state.locations.find(l=>l.id===emp.locationId) : null;
+
+    // Geofencing checks distance to THIS employee's assigned branch only.
+    if (s.enforceGeofence && myLoc){
+      if (!loc){
+        toast('Lokasi GPS tidak bisa diakses. Aktifkan izin lokasi di browser/HP kamu — geofencing sedang aktif, jadi absen tanpa lokasi tidak bisa diproses.');
+        return;
+      }
+      const dist = distanceMeters(loc.lat, loc.lng, myLoc.lat, myLoc.lng);
+      if (dist !== null && dist > myLoc.radiusM){
+        toast(`Di luar area ${myLoc.name} (jarak ${Math.round(dist)}m, radius ${myLoc.radiusM}m).`);
+        return;
+      }
+    }
+
+    const now = new Date();
+    const t = pad2(now.getHours())+':'+pad2(now.getMinutes());
+    const lateLimit = minutesOf(s.workStart) + s.lateTolerance;
+    const status = minutesOf(t) > lateLimit ? 'late' : 'present';
+    let att = todaysAttendance(userId);
+    if (!att){
+      att = { id: state.nextIds.att++, userId, date: todayISO(), clockIn:null, clockOut:null, status:'present', overtimeHours:0, hasLoc:false, selfieIn:null, selfieOut:null };
+      state.attendance.push(att);
+    }
+    att.clockIn = t; att.status = status; att.hasLoc = !!loc;
+    att.selfieIn = selfie || null;
+    toast(loc ? 'Absen masuk berhasil (lokasi & selfie tercatat).' : 'Absen masuk berhasil.');
+    renderEmployee();
+  });
+}
+function doClockOut(userId, selfie){
+  if (state.settings.requireSelfie && !selfie){ toast('Selfie wajib untuk absen pulang.'); return; }
+  withLocation(loc => {
+    const s = state.settings;
+    const now = new Date();
+    const t = pad2(now.getHours())+':'+pad2(now.getMinutes());
+    const att = todaysAttendance(userId);
+    if (!att || !att.clockIn){ toast('Kamu belum absen masuk.'); return; }
+    const overtimeMin = Math.max(0, minutesOf(t) - minutesOf(s.workEnd));
+    att.clockOut = t; att.overtimeHours = +(overtimeMin/60).toFixed(2);
+    att.selfieOut = selfie || null;
+    toast('Absen pulang berhasil.');
+    renderEmployee();
+  });
+}
+
+/* ---- Selfie capture flow ---- */
+let selfieStream = null;
+let selfieCapturedDataUrl = null;
+let selfiePendingAction = null; // 'in' | 'out'
+let selfiePendingUserId = null;
+
+function openSelfieCapture(type, userId){
+  selfiePendingAction = type;
+  selfiePendingUserId = userId;
+  selfieCapturedDataUrl = null;
+  $('#selfieModal').hidden = false;
+  $('#selfieModalTitle').textContent = type==='in' ? 'Selfie untuk Absen Masuk' : 'Selfie untuk Absen Pulang';
+  $('#selfiePreview').hidden = true;
+  $('#selfieVideo').hidden = false;
+  $('#selfieCaptureBtn').hidden = false;
+  $('#selfieRetakeBtn').hidden = true;
+  $('#selfieConfirmBtn').hidden = true;
+  $('#selfieStatus').hidden = true;
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showSelfieCameraUnavailable('Browser ini tidak mendukung akses kamera langsung. Upload foto selfie dari tombol di bawah.');
+    return;
+  }
+  $('#selfieStatus').textContent = 'Mengaktifkan kamera...';
+  $('#selfieStatus').hidden = false;
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio:false })
+    .then(stream => {
+      if (selfiePendingAction === null){ stream.getTracks().forEach(t=>t.stop()); return; } // modal was cancelled while awaiting permission
+      selfieStream = stream;
+      const video = $('#selfieVideo');
+      video.srcObject = stream;
+      video.play().catch(()=>{});
+      $('#selfieStatus').hidden = true;
+    })
+    .catch(() => {
+      showSelfieCameraUnavailable('Tidak bisa mengakses kamera (izin ditolak atau tidak tersedia). Upload foto selfie dari tombol di bawah sebagai gantinya.');
+    });
+}
+
+function showSelfieCameraUnavailable(msg){
+  $('#selfieStatus').textContent = msg;
+  $('#selfieStatus').hidden = false;
+  $('#selfieVideo').hidden = true;
+  $('#selfieCaptureBtn').hidden = true;
+}
+
+function captureSelfie(){
+  const video = $('#selfieVideo');
+  if (!video.videoWidth){ toast('Kamera belum siap, tunggu sebentar lalu coba lagi.'); return; }
+  const canvas = $('#selfieCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.translate(canvas.width, 0); ctx.scale(-1, 1); // mirror so it looks like a normal selfie
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  selfieCapturedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  applyCapturedSelfiePreview();
+}
+
+function handleSelfieFileUpload(input){
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    selfieCapturedDataUrl = e.target.result;
+    applyCapturedSelfiePreview();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function applyCapturedSelfiePreview(){
+  stopSelfieStream();
+  $('#selfieVideo').hidden = true;
+  $('#selfiePreview').src = selfieCapturedDataUrl;
+  $('#selfiePreview').hidden = false;
+  $('#selfieStatus').hidden = true;
+  $('#selfieCaptureBtn').hidden = true;
+  $('#selfieRetakeBtn').hidden = false;
+  $('#selfieConfirmBtn').hidden = false;
+}
+
+function retakeSelfie(){
+  const type = selfiePendingAction, userId = selfiePendingUserId;
+  selfieCapturedDataUrl = null;
+  openSelfieCapture(type, userId);
+}
+
+function stopSelfieStream(){
+  if (selfieStream){ selfieStream.getTracks().forEach(t=>t.stop()); selfieStream = null; }
+}
+
+function closeSelfieModal(){
+  stopSelfieStream();
+  selfieCapturedDataUrl = null;
+  selfiePendingAction = null;
+  selfiePendingUserId = null;
+  $('#selfieModal').hidden = true;
+}
+
+function confirmSelfieAndProceed(){
+  if (!selfieCapturedDataUrl){ toast('Ambil atau upload foto selfie dulu sebelum lanjut.'); return; }
+  const type = selfiePendingAction, userId = selfiePendingUserId, photo = selfieCapturedDataUrl;
+  stopSelfieStream();
+  $('#selfieModal').hidden = true;
+  selfieCapturedDataUrl = null; selfiePendingAction = null; selfiePendingUserId = null;
+  if (type==='in') doClockIn(userId, photo); else doClockOut(userId, photo);
+}
+
+function empAttendanceHtml(emp){
+  const rows = state.attendance.filter(a=>a.userId===emp.id).sort((a,b)=>b.date.localeCompare(a.date));
+  return `
+    <h3 style="font-size:.9rem;margin:0 0 10px;">Riwayat Absensi</h3>
+    ${rows.length ? rows.map(a=>`<div class="hist-row"><span class="mono" style="color:var(--ink-soft)">${a.date}</span><span class="mono">${a.clockIn||'-'}–${a.clockOut||'-'}</span><div style="display:flex;align-items:center;gap:6px;">${selfieThumbHtml(a.id,'in',a.selfieIn)}${selfieThumbHtml(a.id,'out',a.selfieOut)}${statusPill(a.status)}</div></div>`).join('') : `<div class="empty">Belum ada data.</div>`}
+  `;
+}
+
+function empLeaveHtml(emp){
+  const rows = state.leaves.filter(l=>l.userId===emp.id).sort((a,b)=>b.id-a.id);
+  return `
+    <h3 style="font-size:.9rem;margin:0 0 10px;">Ajukan Cuti/Izin</h3>
+    <div class="field"><label>Jenis</label>
+      <select id="lvType"><option value="cuti">Cuti Tahunan</option><option value="izin">Izin</option><option value="sakit">Sakit</option></select>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Dari</label><input type="date" id="lvStart" value="${todayISO()}"></div>
+      <div class="field"><label>Sampai</label><input type="date" id="lvEnd" value="${todayISO()}"></div>
+    </div>
+    <div class="field"><label>Alasan</label><textarea id="lvReason" rows="2" placeholder="opsional"></textarea></div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:18px;" onclick="submitLeave(${emp.id})">Ajukan</button>
+    <h3 style="font-size:.9rem;margin:0 0 8px;">Riwayat Pengajuan</h3>
+    ${rows.length ? rows.map(l=>`
+      <div class="hist-row" style="align-items:flex-start;flex-direction:column;gap:4px;padding-block:10px;">
+        <div style="display:flex;justify-content:space-between;width:100%;">
+          <span style="text-transform:capitalize;font-weight:600;">${l.type}</span>${leavePill(l.status)}
+        </div>
+        <span class="mono" style="font-size:.78rem;color:var(--ink-soft);">${l.start} s/d ${l.end}</span>
+      </div>`).join('') : `<div class="empty">Belum ada pengajuan.</div>`}
+  `;
+}
+function submitLeave(userId){
+  const type = $('#lvType').value, start = $('#lvStart').value, end = $('#lvEnd').value, reason = $('#lvReason').value.trim();
+  if (!start || !end){ toast('Isi tanggal cuti dulu ya.'); return; }
+  state.leaves.push({ id: state.nextIds.leave++, userId, type, start, end, reason, status:'pending' });
+  toast('Pengajuan terkirim, menunggu persetujuan admin.');
+  renderEmployee();
+}
+
+function empPayslipHtml(emp){
+  if (state.viewingPayslip){
+    const item = state.viewingPayslip;
+    const run = state.payrollRuns.find(r=>r.id===item.runId);
+    return `
+      <button class="btn btn-ghost btn-sm" style="margin-bottom:12px;" onclick="state.viewingPayslip=null; renderEmployee();">&larr; Kembali</button>
+      <h3 style="font-size:1rem;margin:0 0 2px;">Slip Gaji ${fmtMonthYear(run.month,run.year)}</h3>
+      <p style="font-size:.75rem;color:var(--ink-soft);margin:0 0 14px;">${escapeHtml(state.settings.companyName)}</p>
+      <div style="font-size:.82rem;display:flex;flex-direction:column;gap:4px;">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-top:6px;">Pendapatan</div>
+        <div class="hist-row"><span>Gaji Pokok</span><span class="mono">${rupiah(item.base)}</span></div>
+        <div class="hist-row"><span>Tunjangan</span><span class="mono">${rupiah(item.allowance)}</span></div>
+        <div class="hist-row"><span>Lembur</span><span class="mono">${rupiah(item.overtime)}</span></div>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-top:10px;">Potongan</div>
+        <div class="hist-row"><span>Keterlambatan</span><span class="mono">-${rupiah(item.lateDed)}</span></div>
+        <div class="hist-row"><span>Ketidakhadiran</span><span class="mono">-${rupiah(item.absenceDed)}</span></div>
+        <div class="hist-row"><span>BPJS</span><span class="mono">-${rupiah(item.bpjsKes+item.bpjsJht+item.bpjsJp)}</span></div>
+        <div class="hist-row"><span>Estimasi PPh 21</span><span class="mono">-${rupiah(item.pph21)}</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);margin-top:10px;padding-top:10px;">
+        <b>Gaji Bersih</b><b class="mono" style="font-size:1.15rem;color:var(--accent);">${rupiah(item.net)}</b>
+      </div>
+      <div class="disclaimer" style="margin-top:14px;">Estimasi BPJS &amp; PPh 21 — bukan perhitungan pajak resmi, perlu verifikasi akuntan.</div>
+    `;
+  }
+  const items = state.payrollItems.filter(i=>i.userId===emp.id).map(i=>({...i, run: state.payrollRuns.find(r=>r.id===i.runId)})).sort((a,b)=> (b.run.year-a.run.year) || (b.run.month-a.run.month));
+  return `
+    <h3 style="font-size:.9rem;margin:0 0 10px;">Slip Gaji</h3>
+    ${items.length ? items.map(i=>`
+      <button onclick='state.viewingPayslip=${JSON.stringify(i).replace(/'/g,"&apos;")}; renderEmployee();' class="card" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 14px;margin-bottom:8px;text-align:left;border:1px solid var(--border);cursor:pointer;background:var(--surface);">
+        <span style="font-size:.85rem;font-weight:600;">${fmtMonthYear(i.run.month,i.run.year)}</span>
+        <span class="mono" style="font-weight:700;color:var(--accent);">${rupiah(i.net)}</span>
+      </button>
+    `).join('') : `<div class="empty">Belum ada slip gaji.</div>`}
+  `;
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+seed();
+render();
+</script>

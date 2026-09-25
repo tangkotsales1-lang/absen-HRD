@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Absensi Klandestine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -308,7 +313,8 @@
   [hidden]{display:none !important;}
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
 </style>
-
+</head>
+<body>
 <header class="top">
   <div class="top-inner">
     <div class="brand">
@@ -1381,7 +1387,6 @@ function showAuthError(msg){
 }
 
 function employeeLoginHtml(){
-  const demoList = state.employees.slice(0,3).map(e=>e.email).join(', ');
   return `
     <div class="auth-wrap">
       <div class="card auth-card">
@@ -1391,7 +1396,6 @@ function employeeLoginHtml(){
         <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="nama@klandestine.local"></div>
         <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
         <button class="btn btn-primary big-btn" onclick="doEmployeeLogin()">Masuk</button>
-        <p class="auth-hint">Coba demo: ${escapeHtml(demoList)} — password <b>karyawan123</b> untuk semua akun contoh.</p>
         <p class="auth-switch">Belum punya akun? <a href="#" onclick="switchAuthView('register');return false;">Daftar di sini</a></p>
       </div>
     </div>
@@ -1815,3 +1819,5 @@ function empPayslipHtml(emp){
 seed();
 render();
 </script>
+</body>
+</html>
